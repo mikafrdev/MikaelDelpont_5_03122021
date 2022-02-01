@@ -1,11 +1,85 @@
-const queryString = window.location.search
-const searchID = new URLSearchParams(queryString)
-const isIDinQuery = searchID.get('id')
-const productID = searchID.get('id')
+class Product {
 
-const retrieveKanapMockedData = async (productID) => fetch('http://localhost:3000/api/products/' + productID)
-    .then(res => res.json())
-    .catch(err => console.log("Erreur fetch", err))
+    constructor() {
+        console.log("Constructeur OK")
+    }
+
+    getMockedData = async () => {
+
+        const productID = getIdProductFromUrl()
+    
+        await fetch('http://localhost:3000/api/products/' + productID)
+        .then((response) => {
+            if (response.ok) {
+                console.log("Réponse ok du server")
+                return response.json();
+            }else{
+                console.log("Problème server")
+            }
+        })
+        .then((data) => { 
+            console.log('Success:', data)
+            this.altTxt = data.altTxt
+            this.colors = data.colors
+            this.description = data.description
+            this.imageUrl = data.imageUrl
+            this.name = data.name
+            this.price = data.price
+        })
+        .catch((error) => { console.error('Error:', error) });
+    }
+
+    displayProduct = (Product) => {
+
+        console.log("displayProduct")
+    
+        const node_IMGcnt =  document.getElementsByClassName('item__img')
+        const node_IMG = document.createElement("img")
+        node_IMG.setAttribute("src", Product.imageUrl)
+        node_IMG.setAttribute("alt", Product.altTxt)
+        node_IMGcnt[0].appendChild(node_IMG)
+    
+        const node_h1 =  document.getElementById('title')
+        node_h1.textContent = Product.name
+    
+        const node_price =  document.getElementById('price')
+        node_price.textContent = Product.price
+    
+        const node_description =  document.getElementById('description')
+        node_description.textContent = Product.description
+    
+        const node_select =  document.getElementById('colors')
+        
+        for(const color in Product.colors){
+            const node_option = document.createElement("option")
+            node_option.setAttribute("value", Product.colors[color])
+            node_option.textContent = Product.colors[color]
+            node_select.appendChild(node_option)
+        }
+    
+    }
+
+    addOrder = () => { 
+        document.getElementById("addToCart").onclick = function() {
+            console.log("onclick fonction !")            
+        }
+    }
+}
+
+const getIdProductFromUrl = () => {
+    const queryString = window.location.search
+    const searchID = new URLSearchParams(queryString)
+    const productID = searchID.get('id')
+
+    return productID
+}
+
+class Order {
+
+    constructor() {
+        console.log("Constructeur OK")
+    }
+}
 
 const addOrder = (Product) => {
 
@@ -104,45 +178,22 @@ const test = (OrderKey) => {
     }
     
 }
-    
-    
-
-    //console.log("test : "+getLocaStorageKeys[0].name)
-
-    //isOrderInChart = getLocaStorageKeys.includes(orderKeyStringified)
-
-const displayProduct = (Product) => {
-
-    console.log("displayProduct")
-
-    const node_IMGcnt =  document.getElementsByClassName('item__img')
-    const node_IMG = document.createElement("img")
-    node_IMG.setAttribute("src", Product.imageUrl)
-    node_IMG.setAttribute("alt", Product.altTxt)
-    node_IMGcnt[0].appendChild(node_IMG)
-
-    const node_h1 =  document.getElementById('title')
-    node_h1.textContent = Product.name
-
-    const node_price =  document.getElementById('price')
-    node_price.textContent = Product.price
-
-    const node_description =  document.getElementById('description')
-    node_description.textContent = Product.description
-
-    const node_select =  document.getElementById('colors')
-    
-    for(const color in Product.colors){
-        const node_option = document.createElement("option")
-        node_option.setAttribute("value", Product.colors[color])
-        node_option.textContent = Product.colors[color]
-        node_select.appendChild(node_option)
-    }
-
-}
 
 const main = async () => {
-    const Product = await retrieveKanapMockedData(productID)
+
+    //let unKanap = await getMockedData()
+
+    //console.log("TEST : "+await getMockedData())
+    
+    let kanapProduct = new Product()
+    let ok = await kanapProduct.getMockedData()
+
+    console.log(ok)
+
+    
+
+    //kanapProduct.addOrder()
+    //const Product = await retrieveKanapMockedData(productID)
 
     /*
     Product = {
@@ -163,11 +214,11 @@ const main = async () => {
     }
     */
     
-    displayProduct(Product)
+    //displayProduct(unKanap)
 
     //Au clic sur le bouton "Ajouter au panier"
     document.getElementById("addToCart").onclick = function() {
-        addOrder(Product)
+        addOrder(unKanap)
     }
 }
 

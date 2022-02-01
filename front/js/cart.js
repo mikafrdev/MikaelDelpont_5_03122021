@@ -17,6 +17,23 @@ const recupKanap = fetch("http://localhost:3000/api/order/", {
         "Content-Type": "application/json"
     }
 })
+
+fetch('https://example.com/profile', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+.then((response) => response.json())
+//Then with the data from the response in JSON...
+.then((data) => {
+  console.log('Success:', data);
+})
+//Then with the error genereted...
+.catch((error) => {
+  console.error('Error:', error);
+});
 */
 
 const queryString = window.location.search
