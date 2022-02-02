@@ -8,7 +8,7 @@ class Product {
 
         const productID = getIdProductFromUrl()
     
-        await fetch('http://localhost:3000/api/products/' + productID)
+        let canap = await fetch('http://localhost:3000/api/products/' + productID)
         .then((response) => {
             if (response.ok) {
                 console.log("Réponse ok du server")
@@ -19,49 +19,95 @@ class Product {
         })
         .then((data) => { 
             console.log('Success:', data)
-            this.altTxt = data.altTxt
-            this.colors = data.colors
-            this.description = data.description
-            this.imageUrl = data.imageUrl
-            this.name = data.name
-            this.price = data.price
+            return data
         })
         .catch((error) => { console.error('Error:', error) });
+
+        return canap
     }
 
-    displayProduct = (Product) => {
+    displayProduct = (product) => {
 
         console.log("displayProduct")
     
         const node_IMGcnt =  document.getElementsByClassName('item__img')
         const node_IMG = document.createElement("img")
-        node_IMG.setAttribute("src", Product.imageUrl)
-        node_IMG.setAttribute("alt", Product.altTxt)
+        node_IMG.setAttribute("src", product.imageUrl)
+        node_IMG.setAttribute("alt", product.altTxt)
         node_IMGcnt[0].appendChild(node_IMG)
     
         const node_h1 =  document.getElementById('title')
-        node_h1.textContent = Product.name
+        node_h1.textContent = product.name
     
         const node_price =  document.getElementById('price')
-        node_price.textContent = Product.price
+        node_price.textContent = product.price
     
         const node_description =  document.getElementById('description')
-        node_description.textContent = Product.description
+        node_description.textContent = product.description
     
         const node_select =  document.getElementById('colors')
         
-        for(const color in Product.colors){
+        for(const color in product.colors){
             const node_option = document.createElement("option")
-            node_option.setAttribute("value", Product.colors[color])
-            node_option.textContent = Product.colors[color]
+            node_option.setAttribute("value", product.colors[color])
+            node_option.textContent = product.colors[color]
             node_select.appendChild(node_option)
         }
-    
+    }
+}
+
+class Order {
+
+    constructor() {}
+
+    isValideForm = () => {
+        
+        console.log("isValideForm")
+        
+        let colorSelected = document.getElementById("colors").value
+        let quantitySelected = document.getElementById("quantity").value
+
+        console.log("colorSelected : "+colorSelected)
+        console.log("quantitySelected : "+quantitySelected)
+
+        if (colorSelected == "" || quantitySelected == 0) {
+            return false
+        }else{
+            return true
+        }
     }
 
-    addOrder = () => { 
-        document.getElementById("addToCart").onclick = function() {
-            console.log("onclick fonction !")            
+    //Au clic sur le bouton "Ajouter au panier"
+    addOrder = (product) => {
+
+        console.log("isValideForm() : "+this.isValideForm())
+ 
+        if (this.isValideForm()) {
+
+            console.log("Formulaire valide")
+            
+            let orderKey = {
+                id: product._id,
+                color: document.getElementById('colors').value
+            }
+
+            let OrderKeyStringified = JSON.stringify(orderKey)
+            let OrderValueStringified = JSON.stringify(document.getElementById('quantity').value)
+
+            localStorage.setItem(OrderKeyStringified, OrderValueStringified)
+        }else{
+    
+            alert("Formulaire non valide")
+        }
+    }
+    
+    checkOrder = () => {
+        console.log("checkOrder")
+        if (this.colorSelected != "" && this.quantitySelected != 0) {
+
+            console.log("Formulaire valide")
+        }else{
+            console.log("Formulaire KO : PB sélection couleur ou quantité")
         }
     }
 }
@@ -74,151 +120,17 @@ const getIdProductFromUrl = () => {
     return productID
 }
 
-class Order {
-
-    constructor() {
-        console.log("Constructeur OK")
-    }
-}
-
-const addOrder = (Product) => {
-
-    console.log("addOrder")
-
-    console.log(Product)
-
-    const colorChoice = document.getElementById('colors').value
-    const nbProductChoice = document.getElementById('quantity').value
-
-    if (colorChoice != "" && nbProductChoice != 0) {
-
-        console.log("Formulaire valide")
-
-        let Order = {
-            id: Product._id,
-            color: colorChoice,
-            quantity: nbProductChoice
-        }
-
-        console.log(Order.id)
-
-        orderKeyStringified = JSON.stringify(Order["id"])
-        OrderValueStringified = JSON.stringify(Order)
-
-        //includes renvoie TRUE ou FALSE
-        //isOrderInChart = getLocaStorageKeys().includes(orderKeyStringified)
-        const getLocaStorageKeys = []
-        const localStorageLength = localStorage.length
-        let i = 0
-    
-        //Si aucun enregistrement n'est présent dans localStorage
-        if (!localStorage.getItem(Order["_id"])) {
-            localStorage.setItem(Order["_id"], OrderValueStringified)
-            console.log("Enregistrement effectué !")
-        
-        //Si des enregistrements sont présents
-        }else{
-            while (i < localStorageLength) {
-                getLocaStorageKeys[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
-                
-                console.log(getLocaStorageKeys[i])
-
-                //Si l'enregistrement est déjà présent
-                if( colorChoice == getLocaStorageKeys[i].color && nbProductChoice == getLocaStorageKeys[i].quantity ) {
-                    Order["quantity"]++
-                    
-                    //Suppression de l'enregistrement
-                    localStorage.removeItem(localStorage.key(i))
-
-                    localStorage.setItem()
-
-                    alert("L'enregistrement a déjà été mis à jour !")
-                
-                //Si l'enregistrement n'est pas présent
-                }else{
-                    localStorage.setItem(orderKeyStringified, OrderValueStringified)
-                    console.log("Enregistrement effectué !")
-                }
-                i++
-            }
-        }
-
-    }else{
-
-        alert("Formulaire non valide")
-    }
-}
-
-const getOrder = () => {
-    if ( localStorage.getItem('userScribble') ) {
-        var scribble = localStorage.getItem('userScribble');
-    }
-    else {
-        var scribble = 'You can scribble directly on this sticky... and I will also remember your message the next time you visit my blog!';
-    }
-    document.getElementById('scribble').innerHTML = scribble;
-}
-
-const clearOrder = () => {
-    localStorage.clear();
-    return false;
-}
-
-const test = (OrderKey) => {
-    console.log("getLocaStorageKeys")
-
-    const getLocaStorageKeys = []
-    const localStorageLength = localStorage.length
-    console.log(localStorageLength)
-    let i = 0
-
-    //Si aucun enregistrement n'est présent dans localStorage
-    if (localStorageLength == 0) {
-
-    }
-    
-}
-
 const main = async () => {
-
-    //let unKanap = await getMockedData()
-
-    //console.log("TEST : "+await getMockedData())
     
     let kanapProduct = new Product()
-    let ok = await kanapProduct.getMockedData()
+    let kanapPage = await kanapProduct.getMockedData()
+    kanapProduct.displayProduct(kanapPage)
 
-    console.log(ok)
-
+    let kanapOrder = new Order()
     
-
-    //kanapProduct.addOrder()
-    //const Product = await retrieveKanapMockedData(productID)
-
-    /*
-    Product = {
-        altTxt : kanapData.altTxt,
-        color: kanapData.color,
-        description : kanapData.description,
-        id : kanapData.id,
-        imageUrl : kanapData.imageUrl,
-        name: kanapData.nappme,
-        price : kanapData.prpice,
-        quantity: kanapData.quantity
-    }
-    
-    const Order = {
-        id: kanapData._id,
-        color: document.getElementById('colors').value,
-        quantity: document.getElementById('quantity').value
-    }
-    */
-    
-    //displayProduct(unKanap)
-
-    //Au clic sur le bouton "Ajouter au panier"
     document.getElementById("addToCart").onclick = function() {
-        addOrder(unKanap)
+        console.log("onclick fonction !")
+        kanapOrder.addOrder(kanapPage)
     }
 }
 
