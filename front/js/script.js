@@ -1,6 +1,9 @@
 const retrieveKanapMockedData = () => fetch('http://localhost:3000/api/products')
     .then(res => res.json())
-    //.then(data => console.log(data))
+    .then(data => {
+        console.log(data)
+        return data
+    })
     .catch(err => console.log("Oh no", err))
 
 const displayKanaps = (kanapsData) => {
