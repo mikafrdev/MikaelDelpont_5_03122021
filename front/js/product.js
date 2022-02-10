@@ -6,7 +6,7 @@ class Product {
 
     getMockedData = async () => {
 
-        const productID = getIdProductFromUrl()
+        const productID = getIdFromUrl()
     
         let canap = await fetch('http://localhost:3000/api/products/' + productID)
         .then((response) => {
@@ -112,7 +112,7 @@ class Order {
     }
 }
 
-const getIdProductFromUrl = () => {
+const getIdFromUrl = () => {
     const queryString = window.location.search
     const searchID = new URLSearchParams(queryString)
     const productID = searchID.get('id')

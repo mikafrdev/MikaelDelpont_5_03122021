@@ -133,64 +133,68 @@ class Order {
     }
 }
 
-const getIdProductFromUrl = () => {
-    const queryString = window.location.search
-    const searchID = new URLSearchParams(queryString)
-    const productID = searchID.get('id')
-
-    return productID
-}
-
 const _retrieveKanapMockedData = () => fetch('http://localhost:3000/api/products')
     .then(res => res.json())
     //.then(data => console.log(data))
     .catch(err => console.log("Oh no", err))
 
-const displayKanaps = (kanapsData) => {
+const displayKanaps = (kanap) => {
 
-    for(const val in kanapsData){
+    console.log("displayKanaps")
+    console.log("kanap : ", kanap)
 
-        if (kanapsData[val]._id) {
+    let isSameId = true
 
-            const node_root =  document.getElementById('cart__items')
-            const node_article = document.createElement("article")
-            node_article.setAttribute("class", "cart__item")
-            node_article.setAttribute("data-id", kanapData._id)
-            node_article.setAttribute("data-color", kanapData.colors)
-            node_node_root.appendChild(node_article)
-        }
+    for(const val in kanap){
+
+        let htmlContent = `
+        <article class="cart__item" data-id="${kanap[val].id}" data-color="{product-color}">
+            <div class="cart__item__img">
+                <img src="${kanap[val].imageUrl}" alt="${kanap[val].altTxt}">
+            </div>
+            <div class="cart__item__content">
+                <div class="cart__item__content__description">
+                    <h2>${kanap[val].name}</h2>
+                    <p>${kanap[val].color}</p>
+                    <p>${kanap[val].price} €</p>
+                </div>
+                <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                        <p>Qté : ${kanap[val].quantity}</p>
+                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${kanap[val].quantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                        <p class="deleteItem">Supprimer</p>
+                    </div>
+                </div>
+            </div>`
+            
+            if (isSameId) {
+
+                +`<div class="cart__item__content">
+                <div class="cart__item__content__description">
+                    <p>${kanap[val].color}</p>
+                    <p>${kanap[val].price} €</p>
+                </div>
+                <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                        <p>Qté : ${kanap[val].quantity}</p>
+                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${kanap[val].quantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                        <p class="deleteItem">Supprimer</p>
+                    </div>
+                </div>
+            </div>
+            `
+            }
+            `
+        </article>
+        `
+        document.querySelector('#cart__items').insertAdjacentHTML('afterend', htmlContent)
+        
     }
 }
-    
-    
-    /*
-    for(const val in kanapsData){
-
-        const node_A = document.createElement("a")
-        node_A.setAttribute("href", "./product.html?id="+kanapsData[val]._id)
-
-        const node_ARTICLE = document.createElement("article")
-        node_A.appendChild(node_ARTICLE)
-
-        const node_IMG = document.createElement("img")
-        node_IMG.setAttribute("src", kanapsData[val].imageUrl)
-        node_IMG.setAttribute("alt", kanapsData[val].altTxt)
-        node_ARTICLE.appendChild(node_IMG)
-
-        const node_H3 = document.createElement("h3")
-        node_H3.setAttribute("class", "productName")
-        node_H3.textContent = kanapsData[val].name
-        node_ARTICLE.appendChild(node_H3)
-
-        const node_P = document.createElement("p")
-        node_P.setAttribute("class", "productDescription")
-        node_P.textContent = kanapsData[val].description
-        node_ARTICLE.appendChild(node_P)
-
-        document.getElementById("items").appendChild(node_A)
-
-    }
-    */
 
 const _main = async () => {
 
@@ -228,83 +232,53 @@ const getAllProducts = () => fetch('http://localhost:3000/api/products')
     })
     .catch(err => console.log("Oh no", err))
 
+function getOneOrderComparedToLocalStorage(products) {
+    products.find(function(val, index) {
+        if(val._id == idLocalStorage)
+            return true
+    })
+}
+
+//Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
+const retrieveOrder = (products) => {
+    let order = new Array
+    let kanapsOrder = new Array
+
+    for (let i=0; i<localStorage.length; i++) {
+        idLocalStorage = JSON.parse(localStorage.key(i)).id
+
+        //var kanapOrder = getOneOrderComparedToLocalStorage(products)
+        let kanapOrder = products.find(function(val, index) {
+            if(val._id == idLocalStorage) return val
+        })
+
+        order = {
+            id : idLocalStorage,
+            color : JSON.parse(localStorage.key(i)).color,
+            quantity : JSON.parse(localStorage.getItem(localStorage.key(i))),
+            altTxt : kanapOrder.altTxt,
+            description : kanapOrder.description,
+            imageUrl : kanapOrder.imageUrl,
+            name : kanapOrder.name,
+            price : kanapOrder.price
+        }
+
+        kanapsOrder.push(order)
+    }
+    return kanapsOrder
+}
 
 const main = async () => {
-
-    const kanapsProduct = new Product()
-    let kanapsOrder = []
     
     const kanaps = await getAllProducts()
 
-    //console.log("kanaps.length : ", kanaps.length)
-    //console.log("localStorage.length : ", localStorage.length)
+    const kanapsOrder = retrieveOrder(kanaps)
 
-    //console.log("kanaps : ", kanaps)
-    //console.log("localStorage : ", localStorage)
+    const kanapsOrderSorted = kanapsOrder.sort((a, b) => a.id.localeCompare(b.id))
+
+    displayKanaps(kanapsOrderSorted)
+
     
-    for (let i=0; i < localStorage.length; i++) {
-        
-            for (let j=0; j < kanaps.length; j++) {
-            
-            keyLS = JSON.parse(localStorage.key(i))
-
-            //console.log("kanaps[i]._id : ", kanaps[i]._id)
-            //console.log("keyLS.id : ", keyLS.id)
-            
-            if (kanaps[j]._id == keyLS.id) {
-   
-
-                /*
-                kanapsOrder[i] = [
-                    { id: keyLS['id'] },
-                    { colors: keyLS['color'] },
-                    { altTxt: kanaps[1]._id },
-                    { description: kanaps[i].description },
-                    { imageUrl: kanaps[i].imageUrl },
-                    { name: kanaps[i].name },
-                    { price: kanaps[i].price },
-                    { quantity: JSON.parse(localStorage.getItem(localStorage.key(i))) }
-                ]
-                */
-                
-                    kanapsOrder[i] = {
-                        id: keyLS['id'],
-                        colors: keyLS['color'],
-                        altTxt: kanaps[i].altTxt,
-                        description: kanaps[i].description,
-                        imageUrl: kanaps[i].imageUrl,
-                        name: kanaps[i].name,
-                        price: kanaps[i].price,
-                        quantity: JSON.parse(localStorage.getItem(localStorage.key(i)))
-                    }
-                
-                
-            }
-        }
-    }
-
-    //let test1 = Object.values(kanapsOrder)    
-
-    console.log("kanapsOrder : ", kanapsOrder)
-    console.log("kanapsOrder : ", kanapsOrder[2][0])
-    
-    
-    const kanapsOrderSorted = kanapsOrder.sort(function(a, b){
-        //console.log("a et b : ", a, b)
-        return a.a[0].localeCompare(b.b[0])
-    })
-    
-
-    //console.log("kanapsOrderSorted : ", kanapsOrderSorted)
-    
-    //console.log("David : ", test2)
-    
-    //kanapsOrder.sort(function(a, b){return a.id - b.id})
-
-    //console.log("kanapsOrder array : ", (kanapsOrder))
-    //await kanapsOrder.sort(function(a, b){return a.id - b.id})
-    //console.log("kanapsOrder : ", kanapsOrder)
-
 }
 
 main()
