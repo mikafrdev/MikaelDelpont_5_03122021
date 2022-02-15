@@ -167,31 +167,17 @@ const displayKanaps = (kanap) => {
                         <p class="deleteItem">Supprimer</p>
                     </div>
                 </div>
-            </div>`
-            
-            if (isSameId) {
-
-                +`<div class="cart__item__content">
-                <div class="cart__item__content__description">
-                    <p>${kanap[val].color}</p>
-                    <p>${kanap[val].price} €</p>
-                </div>
-                <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                        <p>Qté : ${kanap[val].quantity}</p>
-                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${kanap[val].quantity}">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                        <p class="deleteItem">Supprimer</p>
-                    </div>
-                </div>
             </div>
-            `
-            }
-            `
         </article>
         `
         document.querySelector('#cart__items').insertAdjacentHTML('afterend', htmlContent)
+
+        const node_root =  document.getElementsByClassName('cart__item__content__description')
+        console.log(node_root.innerHTML)
+        const node_p = document.createElement("p")
+        //node_IMG.setAttribute("src", product.imageUrl)
+        node_p.textContent = kanap[val].color
+        node_root.appendChild(node_p)
         
     }
 }

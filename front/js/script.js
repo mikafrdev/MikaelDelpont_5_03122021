@@ -40,6 +40,7 @@ const displayKanaps = (kanapsData) => {
 
 const main = async () => {
     const kanapsData = await retrieveKanapMockedData()
+    //console.log(JSON.stringify(kanapsData))
     displayKanaps(kanapsData)
 }
 
