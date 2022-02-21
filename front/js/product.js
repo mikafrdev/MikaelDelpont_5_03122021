@@ -77,6 +77,24 @@ class Order {
         }
     }
 
+    isColorStillOrdered = (orderValueLS, colorChoice) => {
+
+        //console.log("isColorStillOrdered")
+        //console.log(orderValueLS, colorChoice)
+
+        let i = 0
+        while (i < orderValueLS.length) {
+
+            console.log("boucle : ", orderValueLS[i].color)
+
+            if ( colorChoice == orderValueLS[i].color ) {
+                return i
+            }
+            i++
+        }
+        return -1
+    }
+
     //Au clic sur le bouton "Ajouter au panier"
     addOrder = (product) => {
 
@@ -91,60 +109,66 @@ class Order {
             const colorChoice = document.getElementById('colors').value
             const quantityChoice = document.getElementById('quantity').value
 
-            //console.log("Récup KEY", localStorage.getItem(localStorage.key(product._id)))
+            console.log("Récup KEY", localStorage.getItem(localStorage.key(product._id)))
 
             let NewOrderValue = {}
 
             if(getKeyFromLocalStorage == product._id){
 
-                const orderValueLS = JSON.parse(localStorage.getItem(localStorage.key(product._id)))
+                const getOrderValueLS = JSON.parse(localStorage.getItem(localStorage.key(product._id)))
+                console.log("OUI : ", getOrderValueLS)
                 
                 //console.log("orderValueLS.color et colorChoice : ", orderValueLS.colors, colorChoice)
 
                 //console.log("orderValueLS en test : ", orderValueLS.colors.includes(colorChoice))
                 //console.log("orderValueLS.colors[0] en test : ", orderValueLS.colors[0])
 
-                const indexColorInLS = orderValueLS.colors.indexOf(colorChoice)
-
-                console.log("TEST indexColorInLS : ", indexColorInLS)
-
-                if(indexColorInLS != -1){
-
-                    console.log("Meme couleur")
-
-                    //console.log("colorChoice quantityChoice : ", colorChoice, quantityChoice)
+                //console.log("TEST COLOR", this.isColorStillOrdered (orderValueLS, colorChoice))
                 
-                    NewOrderValue = {
-                        colors : orderValueLS.colors,
-                        quantity : quantityChoice
-                    }
+                //console.log("TEST TABLEAU : ", orderValueLS.length)
+                //console.log("TEST TABLEAU : ", orderValueLS.colors['color'])
 
-                    //console.log("NewOrderValue", NewOrderValue)
+                //const indexColorInLS = orderValueLS.colors[0].indexOf(colorChoice)
+                //console.log("TEST indexColorInLS : ", indexColorInLS)
+
+                const indexSameColor = this.isColorStillOrdered (getOrderValueLS, colorChoice)
+
+                console.log("indexSameColor : ", indexSameColor)
+
+                if(indexSameColor != -1){
+
+                    console.log("Couleur présente")
+
+                    NewOrderValue = getOrderValueLS
+
+                    NewOrderValue[indexSameColor].quantity = quantityChoice
+
+                    
 
                 }else{
 
-                    console.log("Couleur différente")
+                    console.log("Couleur non présente")
 
-                    //{"colors":["Blue","White","Black"],
-                    //{"colors":["Blue", "green"],"quantity":["3"]}
-                    let colorsLS = orderValueLS.colors
+                    NewOrderValue = {color: colorChoice, quantity: quantityChoice}
 
-                    colorsLS.push(colorChoice)
+                    console.log("NewOrderValue", NewOrderValue)
 
+                    getOrderValueLS.push(NewOrderValue)
 
-                    NewOrderValue = {
-                        colors : colorsLS,
-                        quantity : [quantityChoice]
-                    }
+                    NewOrderValue = getOrderValueLS
+
+                    console.log("NewOrderValue", NewOrderValue)
+
                 }
-
-                console.log("NewOrderValue", NewOrderValue)
 
             }else{
-                NewOrderValue = {
-                    colors: [colorChoice],
-                    quantity: [quantityChoice]
-                }
+
+                //{"order":["Blue", 1] ["green, 2"]}
+                //{"order":["Blue", 1], "order":["green, 2"]}
+
+                NewOrderValue = [
+                    {color: colorChoice, quantity: quantityChoice}
+                ]
             }
 
             console.log(NewOrderValue)
@@ -183,7 +207,8 @@ const getIdFromUrl = () => {
 
 const main = async () => {
 
-    localStorage.setItem('107fb5b75607497b96722bda5b504926', '{"colors":["Blue","green"],"quantity":["3"]}')
+    //localStorage.setItem('107fb5b75607497b96722bda5b504926', '{"colors":["Blue","green"],"quantity":["3"]}')
+    //localStorage.setItem('107fb5b75607497b96722bda5b504926', '{"orders":{"colors":"Red","quantity":"3"}}')
     
     let kanapProduct = new Product()
     let kanapPage = await kanapProduct.getMockedData()
