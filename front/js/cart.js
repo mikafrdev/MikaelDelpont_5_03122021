@@ -47,33 +47,123 @@ class Product {
         .catch(err => console.log("Oh no", err))
     }
 
-    displayProduct = (product) => {
+    _displayProduct = (kanap) => {
 
         console.log("displayProduct")
-    
-        const node_IMGcnt =  document.getElementsByClassName('item__img')
-        const node_IMG = document.createElement("img")
-        node_IMG.setAttribute("src", product.imageUrl)
-        node_IMG.setAttribute("alt", product.altTxt)
-        node_IMGcnt[0].appendChild(node_IMG)
-    
-        const node_h1 =  document.getElementById('title')
-        node_h1.textContent = product.name
-    
-        const node_price =  document.getElementById('price')
-        node_price.textContent = product.price
-    
-        const node_description =  document.getElementById('description')
-        node_description.textContent = product.description
-    
-        const node_select =  document.getElementById('colors')
-        
+        console.log(kanap)
+
+        const container = document.getElementById("cart__items")
+        let node_article
+        let node_div
+        let node_div_div
+        let node_img
+        let node_p
+        let node_h2
+
+
+          /*<article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+                <div class="cart__item__img">
+                  <img src="../images/product01.jpg" alt="Photographie d'un canapé">
+                </div>
+                <div class="cart__item__content">
+                  <div class="cart__item__content__description">
+                    <h2>Nom du produit</h2>
+                    <p>Vert</p>
+                    <p>42,00 €</p>
+                  </div>
+                  <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                      <p>Qté : </p>
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                      <p class="deleteItem">Supprimer</p>
+                    </div>
+                  </div>
+                </div>
+            </article> */
+
+        for(const i in kanap){
+            
+            node_article = document.createElement("article")
+            node_article.setAttribute("class", "cart__item")
+            node_article.setAttribute("data-id", kanap[i].id)
+            node_article.setAttribute("data-color", kanap[i].color)
+            node_article.setAttribute("class", "cart__item")
+            container.appendChild(node_article)
+
+            node_div = document.createElement("div")
+            node_div.setAttribute("class", "cart__item__img")
+            node_article.appendChild(node_div)
+
+            node_img = document.createElement("img")
+            node_img.setAttribute("src", kanap[i].imageUrl)
+            node_img.setAttribute("alt", kanap[i].altTxt)
+            node_div.appendChild(node_img)
+
+            node_div = document.createElement("div")
+            node_div.setAttribute("class", "cart__item__content")
+            node_article.appendChild(node_div)
+
+            node_div_div = document.createElement("div")
+            node_div_div.setAttribute("class", "cart__item__content__description")
+            node_div.appendChild(node_div_div)
+
+            node_h2 = document.createElement("h2")
+            node_h2.textContent = kanap[i].name
+            node_div_div.appendChild(node_h2)
+
+            node_p = document.createElement("p")
+            node_p.textContent = kanap[i].details[0].color
+            console.log("TEST : ", kanap[i].details[0].color)
+            node_div_div.appendChild(node_p)
+
+            node_p = document.createElement("p")
+            node_p.textContent = kanap[i].price+" €"
+            node_div_div.appendChild(node_p)
+
+            node_div = document.createElement("div")
+            node_div.setAttribute("class", "cart__item__content__settings")
+            node_div_div.parentElement.appendChild(node_div)
+
+            node_div_div = document.createElement("div")
+            node_div_div.setAttribute("class", "cart__item__content__settings__quantity")
+            node_div.appendChild(node_div_div)
+
+            node_p = document.createElement("p")
+            node_p.textContent = "Qté : "+kanap[i].details[0].quantity
+            node_div_div.appendChild(node_p)
+
+            const node_input = document.createElement("input")
+            node_input.setAttribute("class", "itemQuantity")
+            node_input.setAttribute("type", "number")
+            node_input.setAttribute("name", "itemQuantity")
+            node_input.setAttribute("min", 1)
+            node_input.setAttribute("max", 100)
+            node_input.setAttribute("value", kanap[i].details[0].quantity)
+            node_div_div.appendChild(node_input)
+
+            node_div = document.createElement("div")
+            node_div.setAttribute("class", "cart__item__content__settings__delete")
+            node_div_div.parentElement.appendChild(node_div)
+
+            node_p = document.createElement("p")
+            node_p.setAttribute("class", "deleteItem")
+            node_p.textContent = "Supprimer"
+            node_div.appendChild(node_p)
+        }
+
+        /*
+
         for(const color in product.colors){
             const node_option = document.createElement("option")
             node_option.setAttribute("value", product.colors[color])
             node_option.textContent = product.colors[color]
             node_select.appendChild(node_option)
         }
+
+        */
+
     }
 }
 
@@ -182,6 +272,102 @@ const displayKanaps = (kanap) => {
     }
 }
 
+const displayProduct = (kanap) => {
+
+    console.log("displayKanaps")
+
+    let htmlContent = `
+        <article class="cart__item" data-id="001" data-color="{product-color}">
+            <div class="cart__item__img">
+                <img src="http://localhost:3000/images/kanap02.jpeg" alt="kanap">
+            </div>
+            <div class="cart__item__content">
+                <div class="cart__item__content__description">
+                    <h2>Kanap Cyllène</h2>
+                    <p>Rouge</p>
+                    <p>123 €</p>
+                </div>
+                <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                        <p>Qté : 4</p>
+                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="4">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                        <p class="deleteItem">Supprimer</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+        `
+        //document.querySelector('#cart__items').insertAdjacentHTML('afterend', htmlContent)
+
+        htmlContent = `
+        <article class="cart__item" data-id="001" data-color="{product-color}">
+
+            <div class="cart__item__img">
+                <h2>Kanap Cyllène</h2>
+                <img src="http://localhost:3000/images/kanap02.jpeg" alt="kanap">
+            </div>
+
+            <div class="cart__content">
+
+                <div class="cart__item__content">
+                    <div class="cart__item__content__description">
+                        <p>Rouge</p>
+                        <p>123 €</p>
+                        <div class="cart__item__content__settings">
+                            <div class="cart__item__content__settings__quantity">
+                                <p>Qté : 4</p>
+                                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="4">
+                            </div>
+                            
+                        </div>
+                        <div class="cart__item__content__settings__delete">
+                            <p class="deleteItem">Supprimer</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart__item__content">
+                    <div class="cart__item__content__description">
+                        <p>Rouge</p>
+                        <p>123 €</p>
+                        <div class="cart__item__content__settings">
+                            <div class="cart__item__content__settings__quantity">
+                                <p>Qté : 4</p>
+                                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="4">
+                            </div>
+                            <div class="cart__item__content__settings__delete">
+                                <p class="deleteItem">Supprimer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart__item__content">
+                    <div class="cart__item__content__description">
+                        <p>Rouge</p>
+                        <p>123 €</p>
+                        <div class="cart__item__content__settings">
+                            <div class="cart__item__content__settings__quantity">
+                                <p>Qté : 4</p>
+                                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="4">
+                            </div>
+                            <div class="cart__item__content__settings__delete">
+                                <p class="deleteItem">Supprimer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </article>
+        `
+        document.querySelector('#cart__items').insertAdjacentHTML('afterend', htmlContent)
+
+}
+
 const _main = async () => {
 
     let kanapProduct = new Product()
@@ -231,22 +417,23 @@ const retrieveOrder = (products) => {
     let kanapsOrder = new Array
 
     for (let i=0; i<localStorage.length; i++) {
-        idLocalStorage = JSON.parse(localStorage.key(i)).id
+        
+        let idLocalStorage = localStorage.key(i)
+        let valueFronLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
 
-        //var kanapOrder = getOneOrderComparedToLocalStorage(products)
+        //On récupère les informations du produit correspondant à l'ID de la boucle
         let kanapOrder = products.find(function(val, index) {
-            if(val._id == idLocalStorage) return val
+            if (val._id == idLocalStorage) return val
         })
 
         order = {
             id : idLocalStorage,
-            color : JSON.parse(localStorage.key(i)).color,
-            quantity : JSON.parse(localStorage.getItem(localStorage.key(i))),
             altTxt : kanapOrder.altTxt,
             description : kanapOrder.description,
             imageUrl : kanapOrder.imageUrl,
             name : kanapOrder.name,
-            price : kanapOrder.price
+            price : kanapOrder.price,
+            details : valueFronLocalStorage
         }
 
         kanapsOrder.push(order)
@@ -260,11 +447,12 @@ const main = async () => {
 
     const kanapsOrder = retrieveOrder(kanaps)
 
-    const kanapsOrderSorted = kanapsOrder.sort((a, b) => a.id.localeCompare(b.id))
+    //console.log("kanapsOrder : ", kanapsOrder)
 
-    displayKanaps(kanapsOrderSorted)
+    //const kanapsOrderSorted = kanapsOrder.sort((a, b) => a.id.localeCompare(b.id))
 
-    
+    let kanapProduct = new Product()
+    displayProduct(kanapsOrder)
 }
 
 main()
