@@ -3,6 +3,38 @@ h2 {
     margin-bottom: 30px;
 }
 
+.cart__item__img {
+    margin-bottom: 20px;
+}
+
 .cart__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     width: 100%;
+}
+
+.cart__item__content {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.cart__item__content__description {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+.cart__item__content__description p {
+    margin: 0;
+}
+
+.cart__item__content__settings input {
+    margin-left: 10px;
+}
+
+.cart__item__content__settings__delete {
+    margin-top: 8px;
+    text-align: right;
 }
