@@ -4,13 +4,12 @@ h2 {
 }
 
 .cart__item__img {
-    margin-bottom: 20px;
 }
 
 .cart__content {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     width: 100%;
 }
 
