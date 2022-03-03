@@ -8,7 +8,7 @@ class Product {
         for(const i in kanap){
     
             htmlContent = `
-                <article class="cart__item">
+                <article class="cart__item" data-id="${kanap[i].id}">
     
                     <div class="cart__item__img">
                         <h2>${kanap[i].name}</h2>
@@ -23,11 +23,11 @@ class Product {
                             <div class="cart__item__content">
                                 <div class="cart__item__content__description">
                                     <p>${details[j].color}</p>
-                                    <p>${kanap[i].price} €</p>
+                                    <p class="pricequantity">${kanap[i].price * details[j].quantity} €</p>
                                     <div class="cart__item__content__settings">
                                         <div class="cart__item__content__settings__quantity">
                                             <p>Qté : ${details[j].quantity}</p>
-                                            <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details[j].quantity}" />
+                                            <input data-price="${kanap[i].price}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details[j].quantity}" />
                                         </div>
                                         <div class="cart__item__content__settings__delete">
                                             <p class="deleteItem" data-id="${kanap[i].id}" data-color="${details[j].color}">Supprimer</p>
@@ -49,6 +49,7 @@ class Product {
 
 class Order {
 
+    //
     getProductValueFromLocalStorage = (orderValueLS) => {
 
         let i = 0
@@ -90,27 +91,27 @@ class Order {
         return kanapsOrder
     }
 
+    setOrder = (id, NewOrderValue) => {
+        JSON.stringify(OrderValueStringified)
+        let OrderValueStringified = JSON.stringify(NewOrderValue)
+        localStorage.setItem(id, OrderValueStringified)
+    }
+
     deleteOrder = () => {
         let deleteLinks = document.getElementsByClassName("deleteItem")
 
         for (var i=0; i < deleteLinks.length; i++) {
-            deleteLinks[i].onclick = function(){
-                
+
+            deleteLinks[i].onclick = function () {
                 deleteLinks = document.getElementsByClassName("deleteItem")
                 let idProductSelected = this.getAttribute("data-id")
                 let colorProductSelected = this.getAttribute("data-color")
-
                 let getValueFromLocalStorage = localStorage.getItem(idProductSelected)
                 let valueLocalStorage = JSON.parse(getValueFromLocalStorage)
-
                 let indexRowColor
                 let getParentCardNode
-                let test1
-
                 
                 indexRowColor = valueLocalStorage.findIndex(row =>row.color == colorProductSelected)
-
-                console.log("valueLocalStorage avant : ", valueLocalStorage, valueLocalStorage.length)
                 
                 //Si l'utilisateur supprime le produit avec 1 seule couleur
                 if (valueLocalStorage.length == 1) {
@@ -124,17 +125,19 @@ class Order {
                     getParentCardNode.remove()
                     localStorage.removeItem(idProductSelected)
                     
-                    this.setOrder(idProductSelected, valueLocalStorage)
+                    //Order.setOrder(idProductSelected, valueLocalStorage) - A FAIRE
+                    let OrderValueStringified = JSON.stringify(valueLocalStorage)
+                    localStorage.setItem(idProductSelected, OrderValueStringified)
                 }
-                console.log("valueLocalStorage après : ", valueLocalStorage, valueLocalStorage.length)
             }
         }
     }
 
-    setOrder = (id, NewOrderValue) => {
-        JSON.stringify(OrderValueStringified)
-        let OrderValueStringified = JSON.stringify(NewOrderValue)
-        localStorage.setItem(id, OrderValueStringified)
+    _setPricebyProduct = () => {
+        const changeProductsPrice = document.getElementsByClassName("deleteItem")
+        changeProductsPrice.forEach(element => {
+            console.log("TEST : ", changeProductsPrice[element])
+        })
     }
 }
 
@@ -157,8 +160,22 @@ const main = async () => {
     const order = new Order()
     const kanapsOrder = order.retrieveOrder(kanaps)
     kanapProduct.displayProduct(kanapsOrder)
-    order.deleteOrder()
 
+    const changeProductsPrice = document.getElementsByClassName("itemQuantity")
+
+    for (let i = 0; i < changeProductsPrice.length; i++) {
+        changeProductsPrice[i].onclick = function () {
+
+            let currentProductBasicPrice = this.getAttribute("data-price")
+            let newProductPriceQuantity = currentProductBasicPrice*this.value
+            this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
+            changeProductsPrice[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
+
+        }
+    }
+
+    //order.setPricebyProduct()
+    order.deleteOrder()
 }
 
 main()
