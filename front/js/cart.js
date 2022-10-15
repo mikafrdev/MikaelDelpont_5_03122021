@@ -211,22 +211,20 @@ const main = async () => {
         changeProductQuantity[i].onclick = function () {
 
             let currentProductBasicPrice = this.getAttribute("data-price")
-            let newProductPriceQuantity = currentProductBasicPrice*this.value
+            let newProductPriceQuantity = currentProductBasicPrice * this.value
             this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
+
+            let productsFromLocalStorage = order.getProductsFromLocalStorage()
+            let countColorProductsFromLocalstorage = 0
             
-            //DEBUT TEST
-            //console.log("TEST CALCUL : "+document.getElementById("totalQuantity").innerText)
-            let ProductsFromLocalStorage = order.getProductsFromLocalStorage()
-            console.log(ProductsFromLocalStorage[1].color[1])
-            console.log(ProductsFromLocalStorage.filter(color => color === 2).length)
-            ProductsFromLocalStorage.filter(
-                function(x){
-                    return x==2}
-                ).length
-            //FIN TEST
+            for (let j = 0; j < productsFromLocalStorage.length; j++) {
+                for (let k = 0; k < productsFromLocalStorage[j].color.length; k++) {
+                    countColorProductsFromLocalstorage += parseInt(productsFromLocalStorage[j].color[k].quantity)
+                }
+            }
 
             //changeProductQuantity[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
-            document.getElementById("totalQuantity").innerHTML = "test"
+            document.getElementById("totalQuantity").innerHTML = countColorProductsFromLocalstorage
         }
     }
 
