@@ -1,3 +1,4 @@
+//Récupère les données de tous les canapés dans la BDD
 const retrieveKanapMockedData = () => fetch('http://localhost:3000/api/products')
     .then(res => res.json())
     .then(data => {
@@ -6,6 +7,7 @@ const retrieveKanapMockedData = () => fetch('http://localhost:3000/api/products'
     })
     .catch(err => console.log("Oh no", err))
 
+//Affiche les canapés passés en paramètre en produisant du code HTML
 const displayKanaps = (kanapsData) => {
 
     for(const val in kanapsData){

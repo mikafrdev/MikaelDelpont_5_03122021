@@ -4,6 +4,7 @@ class Product {
         //console.log("Constructeur OK")
     }
 
+    //Récupération des données d'un canapé en scannant l'url qui renseigne son ID 
     getMockedData = async () => {
 
         const productID = getIdFromUrl()
@@ -26,9 +27,8 @@ class Product {
         return canap
     }
 
-    displayProduct = (product) => {
-
-        console.log("displayProduct")
+    //Affiche les informations d'un canapé passé en paramètre (objet) en produisant du code HTML
+    displayProduct = (product) => {        
     
         const node_IMGcnt =  document.getElementsByClassName('item__img')
         const node_IMG = document.createElement("img")
@@ -60,6 +60,7 @@ class Order {
 
     constructor() {}
 
+    //On vérifie qu'une couleur et qu'un nombre d'article ont bien été sélectionnés
     isValideForm = () => {
         
         console.log("isValideForm")
@@ -74,6 +75,7 @@ class Order {
         }
     }
 
+    //On vérifie que la couleur de l'article est déjà présente dans le localStorage sinon on renvoie -1
     isColorStillOrdered = (orderValueLS, colorChoice) => {
 
         let i = 0
@@ -85,7 +87,7 @@ class Order {
         return -1
     }
 
-    //Au clic sur le bouton "Ajouter au panier"
+    //Au clic sur le bouton "Ajouter au panier", on vérifie si le canapé + la couleur existe déjà dans le localStorage
     addOrder = (product) => {
  
         if (this.isValideForm()) {
@@ -95,21 +97,24 @@ class Order {
             const quantityChoice = document.getElementById('quantity').value
             let NewOrderValue = {}
 
+            //S'il y a déjà l'ID du canapé dans le localStorage
             if(valueFronLocalStorage){
 
                 const indexSameColor = this.isColorStillOrdered (valueFronLocalStorage, colorChoice)
 
+                //Si le canapé et la couleur sont présents dans le localStorage, on remplace l'ancien enregistrement par le nouveau
                 if(indexSameColor != -1){
-
                     NewOrderValue = valueFronLocalStorage
                     NewOrderValue[indexSameColor].quantity = quantityChoice
-                }else{
 
+                //Si le canapé est présent dans le localStorage mais pas la couleur, on ajoute un enregistrement avec la nouvelle couleur
+                }else{
                     NewOrderValue = {color: colorChoice, quantity: quantityChoice}
                     valueFronLocalStorage.push(NewOrderValue)
                     NewOrderValue = valueFronLocalStorage
                 }
 
+            //Si l'ID du canapé n'est pas trouvé dans le localStorage, on ajoute un nouvel enregistrement
             }else{
 
                 NewOrderValue = [
@@ -117,11 +122,12 @@ class Order {
                 ]
             }
 
+            //Les données sont converties en STRING avant d'être enregistrées dans le localStorage
             let OrderValueStringified = JSON.stringify(NewOrderValue)
             localStorage.setItem(product._id, OrderValueStringified)
 
+        //Si le formulaire n'est pas valide
         }else{
-    
             alert("Formulaire non valide")
         }
     }
@@ -151,13 +157,17 @@ const main = async () => {
     //localStorage.setItem('107fb5b75607497b96722bda5b504926', '{"orders":{"colors":"Red","quantity":"3"}}')
     
     let kanapProduct = new Product()
+    
+    //On récupère les données du canapé
     let kanapPage = await kanapProduct.getMockedData()
+    
+    //On affiche les données du canapé
     kanapProduct.displayProduct(kanapPage)
 
     let kanapOrder = new Order()
     
+    //On initialise la fonction qui se déclenche au clic sur le bouton "Ajouter au panier"
     document.getElementById("addToCart").onclick = function() {
-        console.log("onclick fonction !")
         kanapOrder.addOrder(kanapPage)
     }
 }
