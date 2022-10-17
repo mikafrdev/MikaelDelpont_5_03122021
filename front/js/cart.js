@@ -13,7 +13,7 @@ class Product {
         for(const i in kanap){
     
             htmlContent = `
-                <article class="cart__item" data-id="${kanap[i].id}">
+                <article class="cart__item" data-id="${kanap[i].id}" data-color="${kanap[i].color}">
     
                     <div class="cart__item__img">
                         <h2>${kanap[i].name}</h2>
@@ -86,7 +86,6 @@ class Order {
 
     //Récupère le contenu du local storage sous la forme d'un tableau d'objets
     getProductsFromLocalStorage = () => {
-        //console.log("Order getProductsFromLocalStorage")
         let productsFromLocalStorage = new Array
         let idLocalStorage
         let i = 0
@@ -102,26 +101,15 @@ class Order {
         return productsFromLocalStorage
     }
 
-    getQuantityFromLocalStorage = (Products) => {
-
-    }
-
     //Work in progress ...
     getProductValueFromLocalStorage = (orderValueLS) => {
-    let i = 0
-    while (i < orderValueLS.length) {
+        let i = 0
+        while (i < orderValueLS.length) {
 
-        if ( colorChoice == orderValueLS[i].color ) return i
-        i++
-    }
-    return -1
-}
-
-    //Work in progress
-    setOrder = (id, NewOrderValue) => {
-        JSON.stringify(OrderValueStringified)
-        let OrderValueStringified = JSON.stringify(NewOrderValue)
-        localStorage.setItem(id, OrderValueStringified)
+            if ( colorChoice == orderValueLS[i].color ) return i
+            i++
+        }
+        return -1
     }
 
     /*
@@ -167,12 +155,95 @@ class Order {
         }
     }
 
+    addOrder = (product) => {
+ 
+        if (this.isValideForm()) {
+            const getValueFromLocalStorage = localStorage.getItem(product._id)
+            const valueFronLocalStorage = JSON.parse(getValueFromLocalStorage)
+            const colorChoice = document.getElementById('colors').value
+            const quantityChoice = document.getElementById('quantity').value
+            let NewOrderValue = {}
+
+            //S'il y a déjà l'ID du canapé dans le localStorage
+            if(valueFronLocalStorage){
+
+                const indexSameColor = this.isColorStillOrdered (valueFronLocalStorage, colorChoice)
+
+                //Si le canapé et la couleur sont présents dans le localStorage, on remplace l'ancien enregistrement par le nouveau
+                if(indexSameColor != -1){
+                    NewOrderValue = valueFronLocalStorage
+                    NewOrderValue[indexSameColor].quantity = quantityChoice
+
+                //Si le canapé est présent dans le localStorage mais pas la couleur, on ajoute un enregistrement avec la nouvelle couleur
+                }else{
+                    NewOrderValue = {color: colorChoice, quantity: quantityChoice}
+                    valueFronLocalStorage.push(NewOrderValue)
+                    NewOrderValue = valueFronLocalStorage
+                }
+
+            //Si l'ID du canapé n'est pas trouvé dans le localStorage, on ajoute un nouvel enregistrement
+            }else{
+
+                NewOrderValue = [
+                    {color: colorChoice, quantity: quantityChoice}
+                ]
+            }
+
+            //Les données sont converties en STRING avant d'être enregistrées dans le localStorage
+            let OrderValueStringified = JSON.stringify(NewOrderValue)
+            localStorage.setItem(product._id, OrderValueStringified)
+
+        //Si le formulaire n'est pas valide
+        }else{
+            alert("Formulaire non valide")
+        }
+    }
+
     //Work in progress
     _setPricebyProduct = () => {
         const changeProductsPrice = document.getElementsByClassName("deleteItem")
         changeProductsPrice.forEach(element => {
             console.log("TEST : ", changeProductsPrice[element])
         })
+    }
+
+    //BUG
+    _onClickAddQuantity = () => {
+        const changeProductQuantity = document.getElementsByClassName("itemQuantity")
+
+        for (let i = 0; i < changeProductQuantity.length; i++) {
+            changeProductQuantity[i].onclick = function () {
+
+                let currentProductBasicPrice = this.getAttribute("data-price")
+                let newProductPriceQuantity = currentProductBasicPrice * this.value
+                this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
+
+                //A VOIR AVEC DIDIER
+                let productsFromLocalStorage = this.getProductsFromLocalStorage()
+                let countColorProductsFromLocalstorage = 0
+                
+                for (let j = 0; j < productsFromLocalStorage.length; j++) {
+                    for (let k = 0; k < productsFromLocalStorage[j].color.length; k++) {
+                        countColorProductsFromLocalstorage += parseInt(productsFromLocalStorage[j].color[k].quantity)
+                    }
+                }
+
+                //changeProductQuantity[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
+                document.getElementById("totalQuantity").innerHTML = countColorProductsFromLocalstorage
+            }
+        }
+    }
+
+    //WIP...
+    getQuantityFromLocalStorage = (Products) => {
+
+    }
+
+    //Work in progress
+    setOrder = (id, NewOrderValue) => {
+        JSON.stringify(OrderValueStringified)
+        let OrderValueStringified = JSON.stringify(NewOrderValue)
+        localStorage.setItem(id, OrderValueStringified)
     }
 }
 
@@ -204,12 +275,56 @@ const main = async () => {
     //On affiche les canapés présents dans le localStorage
     kanapProduct.displayProduct(kanapsOrder)
 
+    //BUG - voir _onClickAddQuantity
+    //order.onClickAddQuantity()
+
     //Début gestion des prix
     const changeProductQuantity = document.getElementsByClassName("itemQuantity")
 
     for (let i = 0; i < changeProductQuantity.length; i++) {
         changeProductQuantity[i].onclick = function () {
 
+            console.log("Click change quantity")
+
+            let _id = this.closest("article").getAttribute("data-id")
+            let colorChoice = this.closest("article").getAttribute("data-color")
+
+            let valueLocalStorageById = JSON.parse(localStorage.getItem(_id))
+
+            const _index = valueLocalStorageById.findIndex(object => {
+                console.log(object.color)
+                console.log(colorChoice)
+                return object.color == colorChoice
+            })
+
+            console.log(valueLocalStorageById)
+
+            const index = valueLocalStorageById.map(object => object.color).indexOf(colorChoice)
+
+            console.log("indexColorRow : "+index)
+
+            /*
+            while () {
+                i++
+            }
+            */
+            
+            let newValueLocalStorage = {
+
+            }
+            //newOrderValue = {color: colorChoice, quantity: quantityChoice}
+            //valueFronLocalStorage.push(NewOrderValue)
+            //localStorage.setItem('myCat', 'Tom')
+
+            /*
+            productsFromLocalStorage.push({
+                id : localStorage.key(i),
+                color: JSON.parse(localStorage.getItem(idLocalStorage))
+            })
+            */
+            //order.addOrder(kanapPage)
+
+            /*
             let currentProductBasicPrice = this.getAttribute("data-price")
             let newProductPriceQuantity = currentProductBasicPrice * this.value
             this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
@@ -225,13 +340,13 @@ const main = async () => {
 
             //changeProductQuantity[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
             document.getElementById("totalQuantity").innerHTML = countColorProductsFromLocalstorage
+            */
         }
     }
 
     //Fin gestion des prix
 
     //order.setPricebyProduct()
-    //console.log("main")
     order.deleteOrder()
 }
 
