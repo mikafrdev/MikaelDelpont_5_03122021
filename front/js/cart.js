@@ -276,7 +276,7 @@ const main = async () => {
     kanapProduct.displayProduct(kanapsOrder)
 
     //BUG - voir _onClickAddQuantity
-    //order.onClickAddQuantity()
+    order.onClickAddQuantity()
 
     //Début gestion des prix
     const changeProductQuantity = document.getElementsByClassName("itemQuantity")

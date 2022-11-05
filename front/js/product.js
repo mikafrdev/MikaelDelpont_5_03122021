@@ -159,7 +159,7 @@ const main = async () => {
     let kanapProduct = new Product()
     
     //On récupère les données du canapé
-    let kanapPage = await kanapProduct.getMockedData()
+    let kanapPage = await kanapProduct.getMockedData(getIdFromUrl())
     
     //On affiche les données du canapé
     kanapProduct.displayProduct(kanapPage)

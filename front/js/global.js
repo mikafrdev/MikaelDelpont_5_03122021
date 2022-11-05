@@ -1,13 +1,19 @@
-//Récupération des données d'un canapé en scannant l'url qui renseigne son ID 
-getMockedData = async () => {
+const getIdFromUrl = () => {
+    const queryString = window.location.search
+    const searchID = new URLSearchParams(queryString)
+    const productID = searchID.get('id')
 
-    const productID = getIdFromUrl()
+    return productID
+}
+
+//Récupération des données mockées d'un canapé en scannant l'url qui renseigne son ID 
+getMockedData = async (productID) => {
 
     let canap = await fetch('http://localhost:3000/api/products/' + productID)
     .then((response) => {
         if (response.ok) {
             //console.log("Réponse ok du server")
-            return response.json();
+            return response.json()
         }else{
             console.log("Problème server")
         }
@@ -16,7 +22,7 @@ getMockedData = async () => {
         //console.log('Success:', data)
         return data
     })
-    .catch((error) => { console.error('Error:', error) });
+    .catch((error) => { console.error('Error:', error) })
 
     return canap
 }
