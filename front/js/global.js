@@ -1,12 +1,9 @@
-const getIdFromUrl = () => {
-    const queryString = window.location.search
-    const searchID = new URLSearchParams(queryString)
-    const productID = searchID.get('id')
+/*
+    Récupération des données mockées d'un produit
+    - Si aucun paramètre n'est passé alors on affiche tous les produits
+    - Si un ID est renseigné en paramètre alors on affiche uniquement les données d'un produit
 
-    return productID
-}
-
-//Récupération des données mockées d'un canapé en scannant l'url qui renseigne son ID 
+*/
 getMockedData = async (productID) => {
 
     let canap = await fetch('http://localhost:3000/api/products/' + productID)

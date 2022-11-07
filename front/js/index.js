@@ -23,7 +23,7 @@ const main = async () => {
     //Récupération des données de tous les produitss avec un argument vide passé en paramètre de la fonction <getMockedData>
     const productsData = await getMockedData("")
     
-    //Affichage de chacun des produits
+    //Affichage de tous les produits
     displayProducts(productsData)
 }
 
