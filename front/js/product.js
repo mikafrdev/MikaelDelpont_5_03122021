@@ -29,8 +29,6 @@ displayProduct = (product) => {
 //On vérifie qu'une couleur et qu'un nombre d'article ont bien été sélectionnés
 isValideForm = () => {
     
-    console.log("isValideForm")
-    
     let colorSelected = document.getElementById("colors").value
     let quantitySelected = document.getElementById("quantity").value
 
@@ -51,51 +49,6 @@ isColorStillOrdered = (orderValueLS, colorChoice) => {
         i++
     }
     return -1
-}
-
-//Au clic sur le bouton "Ajouter au panier", on vérifie si le canapé + la couleur existe déjà dans le localStorage
-addOrder = (product) => {
-
-    if (this.isValideForm()) {
-        const getValueFromLocalStorage = localStorage.getItem(product._id)
-        const valueFronLocalStorage = JSON.parse(getValueFromLocalStorage)
-        const colorChoice = document.getElementById('colors').value
-        const quantityChoice = document.getElementById('quantity').value
-        let NewOrderValue = {}
-
-        //S'il y a déjà l'ID du canapé dans le localStorage
-        if(valueFronLocalStorage){
-
-            const indexSameColor = this.isColorStillOrdered (valueFronLocalStorage, colorChoice)
-
-            //Si le canapé et la couleur sont présents dans le localStorage, on remplace l'ancien enregistrement par le nouveau
-            if(indexSameColor != -1){
-                NewOrderValue = valueFronLocalStorage
-                NewOrderValue[indexSameColor].quantity = quantityChoice
-
-            //Si le canapé est présent dans le localStorage mais pas la couleur, on ajoute un enregistrement avec la nouvelle couleur
-            }else{
-                NewOrderValue = {color: colorChoice, quantity: quantityChoice}
-                valueFronLocalStorage.push(NewOrderValue)
-                NewOrderValue = valueFronLocalStorage
-            }
-
-        //Si l'ID du canapé n'est pas trouvé dans le localStorage, on ajoute un nouvel enregistrement
-        }else{
-
-            NewOrderValue = [
-                {color: colorChoice, quantity: quantityChoice}
-            ]
-        }
-
-        //Les données sont converties en STRING avant d'être enregistrées dans le localStorage
-        let OrderValueStringified = JSON.stringify(NewOrderValue)
-        localStorage.setItem(product._id, OrderValueStringified)
-
-    //Si le formulaire n'est pas valide
-    }else{
-        alert("Formulaire non valide")
-    }
 }
 
 checkOrder = () => {
@@ -129,7 +82,7 @@ const main = async () => {
     
     //On initialise la fonction qui se déclenche au clic sur le bouton "Ajouter au panier"
     document.getElementById("addToCart").onclick = function() {
-        addOrder(productData)
+        setOrder(productData)
     }
 }
 

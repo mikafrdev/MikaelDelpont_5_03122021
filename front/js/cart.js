@@ -1,35 +1,40 @@
 //Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne 
-displayProduct = (kanap) => {
+displayProducts = (productsData) => {
 
-    console.log("displayKanaps")
+    console.log("displayproductsDatas")
     let htmlContent
 
-    for(const i in kanap){
+    for(const i in productsData){
+
+        console.log(productsData[i].details)
+        console.log(productsData[i].details[1].color)
+        //console.log(typeof(productsData[i].details))
 
         htmlContent = `
-            <article class="cart__item" data-id="${kanap[i].id}" data-color="${kanap[i].color}">
+            <article class="cart__item" data-id="${productsData[i].id}" data-color="${productsData[i].color}">
+
 
                 <div class="cart__item__img">
-                    <h2>${kanap[i].name}</h2>
-                    <img src="${kanap[i].imageUrl}" alt="${kanap[i].altTxt}" />
+                    <h2>${productsData[i].name}</h2>
+                    <img src="${productsData[i].imageUrl}" alt="${productsData[i].altTxt}" />
                 </div>
 
                 <div class="cart__content">
         `
-        let details = kanap[i].details
+        let details = productsData[i].details
         for(const j in details){
             htmlContent+= `
                         <div class="cart__item__content">
                             <div class="cart__item__content__description">
                                 <p>${details[j].color}</p>
-                                <p class="pricequantity">${kanap[i].price * details[j].quantity} €</p>
+                                <p class="pricequantity">${productsData[i].price * details[j].quantity} €</p>
                                 <div class="cart__item__content__settings">
                                     <div class="cart__item__content__settings__quantity">
                                         <p>Qté : ${details[j].quantity}</p>
-                                        <input data-price="${kanap[i].price}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details[j].quantity}" />
+                                        <input data-price="${productsData[i].price}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details[j].quantity}" />
                                     </div>
                                     <div class="cart__item__content__settings__delete">
-                                        <p class="deleteItem" data-id="${kanap[i].id}" data-color="${details[j].color}">Supprimer</p>
+                                        <p class="deleteItem" data-id="${productsData[i].id}" data-color="${details[j].color}">Supprimer</p>
                                     </div>
                                 </div>
                             </div>
@@ -47,33 +52,33 @@ displayProduct = (kanap) => {
 
 
 //Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
-retrieveOrder = (products) => {
+getProductsLocalStorage = (products) => {
     let order = new Array
-    let kanapsOrder = new Array
+    let productsDatasOrder = new Array
 
     for (let i=0; i<localStorage.length; i++) {
         
         let idLocalStorage = localStorage.key(i)
-        let valueFronLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
+        let valueLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
 
         //On récupère toutes les informations des produits présents dans le local storage en faisant matcher leur ID avec celui de la BDD
-        let kanapOrder = products.find(function(val, index) {
+        let productsDataOrder = products.find(function(val, index) {
             if (val._id == idLocalStorage) return val
         })
 
         order = {
             id : idLocalStorage,
-            altTxt : kanapOrder.altTxt,
-            description : kanapOrder.description,
-            imageUrl : kanapOrder.imageUrl,
-            name : kanapOrder.name,
-            price : kanapOrder.price,
-            details : valueFronLocalStorage
+            altTxt : productsDataOrder.altTxt,
+            description : productsDataOrder.description,
+            imageUrl : productsDataOrder.imageUrl,
+            name : productsDataOrder.name,
+            price : productsDataOrder.price,
+            details : valueLocalStorage
         }
 
-        kanapsOrder.push(order)
+        productsDatasOrder.push(order)
     }
-    return kanapsOrder
+    return productsDatasOrder
 }
 
 //Récupère le contenu du local storage sous la forme d'un tableau d'objets
@@ -147,50 +152,6 @@ deleteOrder = () => {
     }
 }
 
-addOrder = (product) => {
-
-    if (this.isValideForm()) {
-        const getValueFromLocalStorage = localStorage.getItem(product._id)
-        const valueFronLocalStorage = JSON.parse(getValueFromLocalStorage)
-        const colorChoice = document.getElementById('colors').value
-        const quantityChoice = document.getElementById('quantity').value
-        let NewOrderValue = {}
-
-        //S'il y a déjà l'ID du canapé dans le localStorage
-        if(valueFronLocalStorage){
-
-            const indexSameColor = this.isColorStillOrdered (valueFronLocalStorage, colorChoice)
-
-            //Si le canapé et la couleur sont présents dans le localStorage, on remplace l'ancien enregistrement par le nouveau
-            if(indexSameColor != -1){
-                NewOrderValue = valueFronLocalStorage
-                NewOrderValue[indexSameColor].quantity = quantityChoice
-
-            //Si le canapé est présent dans le localStorage mais pas la couleur, on ajoute un enregistrement avec la nouvelle couleur
-            }else{
-                NewOrderValue = {color: colorChoice, quantity: quantityChoice}
-                valueFronLocalStorage.push(NewOrderValue)
-                NewOrderValue = valueFronLocalStorage
-            }
-
-        //Si l'ID du canapé n'est pas trouvé dans le localStorage, on ajoute un nouvel enregistrement
-        }else{
-
-            NewOrderValue = [
-                {color: colorChoice, quantity: quantityChoice}
-            ]
-        }
-
-        //Les données sont converties en STRING avant d'être enregistrées dans le localStorage
-        let OrderValueStringified = JSON.stringify(NewOrderValue)
-        localStorage.setItem(product._id, OrderValueStringified)
-
-    //Si le formulaire n'est pas valide
-    }else{
-        alert("Formulaire non valide")
-    }
-}
-
 //Work in progress
 _setPricebyProduct = () => {
     const changeProductsPrice = document.getElementsByClassName("deleteItem")
@@ -238,15 +199,6 @@ setOrder = (id, NewOrderValue) => {
     localStorage.setItem(id, OrderValueStringified)
 }
 
-//Récupération des données de tous les canapés présents dans la BDD
-const getAllProducts = () => fetch('http://localhost:3000/api/products')
-    .then(res => res.json())
-    .then(data => {
-        //console.log(data)
-        return data
-    })
-    .catch(err => console.log("Oh no", err))
-
 const main = async () => {
 
     //Enregistrement en dur pour les tests - A supprimer
@@ -255,13 +207,15 @@ const main = async () => {
     //localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
     
     //On récupère les données de tous les canapés depuis la BDD
-    const kanaps = await getAllProducts()
     
-    //On récupère les données de tous les canapés depuis le localStorage
-    const kanapsOrder = retrieveOrder(kanaps)
+    //Récupération des données de tous les produitss avec un argument vide passé en paramètre de la fonction <getMockedData>
+    const productsData = await getMockedData("")
+    
+    //Affichage de tous les produits
+    const productsLocalStorage = getProductsLocalStorage(productsData)
     
     //On affiche les canapés présents dans le localStorage
-    displayProduct(kanapsOrder)
+    displayProducts(productsLocalStorage)
 
     //BUG - voir _onClickAddQuantity
     //onClickAddQuantity()
@@ -301,7 +255,7 @@ const main = async () => {
 
             }
             //newOrderValue = {color: colorChoice, quantity: quantityChoice}
-            //valueFronLocalStorage.push(NewOrderValue)
+            //valueLocalStorage.push(NewOrderValue)
             //localStorage.setItem('myCat', 'Tom')
 
             /*
@@ -310,7 +264,7 @@ const main = async () => {
                 color: JSON.parse(localStorage.getItem(idLocalStorage))
             })
             */
-            //order.addOrder(kanapPage)
+            //order.addOrder(productsDataPage)
 
             /*
             let currentProductBasicPrice = this.getAttribute("data-price")
