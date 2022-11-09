@@ -4,50 +4,49 @@ displayProducts = (productsData) => {
     console.log("displayproductsDatas")
     let htmlContent
 
-    for(const i in productsData){
+    productsData.forEach(function(product){
 
-        console.log(productsData[i].details)
-        console.log(productsData[i].details[1].color)
-        //console.log(typeof(productsData[i].details))
+        console.log(product)
 
         htmlContent = `
-            <article class="cart__item" data-id="${productsData[i].id}" data-color="${productsData[i].color}">
-
+            <article class="cart__item" data-id="${product.id}" data-color="${product.color}">
 
                 <div class="cart__item__img">
-                    <h2>${productsData[i].name}</h2>
-                    <img src="${productsData[i].imageUrl}" alt="${productsData[i].altTxt}" />
+                    <h2>${product.name}</h2>
+                    <img src="${product.imageUrl}" alt="${product.altTxt}" />
                 </div>
 
                 <div class="cart__content">
         `
-        let details = productsData[i].details
-        for(const j in details){
-            htmlContent+= `
-                        <div class="cart__item__content">
-                            <div class="cart__item__content__description">
-                                <p>${details[j].color}</p>
-                                <p class="pricequantity">${productsData[i].price * details[j].quantity} €</p>
-                                <div class="cart__item__content__settings">
-                                    <div class="cart__item__content__settings__quantity">
-                                        <p>Qté : ${details[j].quantity}</p>
-                                        <input data-price="${productsData[i].price}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details[j].quantity}" />
-                                    </div>
-                                    <div class="cart__item__content__settings__delete">
-                                        <p class="deleteItem" data-id="${productsData[i].id}" data-color="${details[j].color}">Supprimer</p>
-                                    </div>
+        product.details.forEach(function(details){
+
+            console.log(details)
+
+            htmlContent += `
+                    <div class="cart__item__content">
+                        <div class="cart__item__content__description">
+                            <p>${details.color}</p>
+                            <p class="pricequantity">${product.price * details.quantity} €</p>
+                            <div class="cart__item__content__settings">
+                                <div class="cart__item__content__settings__quantity">
+                                    <p>Qté : ${details.quantity}</p>
+                                    <input data-price="${product.price}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details.quantity}" />
+                                </div>
+                                <div class="cart__item__content__settings__delete">
+                                    <p class="deleteItem" data-id="${product.id}" data-color="${details.color}">Supprimer</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
             `
-        }
-        htmlContent+= `
+        })
+        htmlContent += `
                 </div>
 
             </article>
             `
         document.querySelector('#cart__items').insertAdjacentHTML('afterend', htmlContent)
-    }
+    })
 }
 
 
