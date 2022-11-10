@@ -1,4 +1,7 @@
-//Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne 
+/*
+    Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
+    calcul le prix des articles en fonction des quantités sélectionnées
+*/
 displayProducts = (productsData) => {
 
     console.log("displayproductsDatas")
@@ -6,10 +9,8 @@ displayProducts = (productsData) => {
 
     productsData.forEach(function(product){
 
-        console.log(product)
-
         htmlContent = `
-            <article class="cart__item" data-id="${product.id}" data-color="${product.color}">
+            <article class="cart__item" data-id="${product.id}">
 
                 <div class="cart__item__img">
                     <h2>${product.name}</h2>
@@ -19,8 +20,6 @@ displayProducts = (productsData) => {
                 <div class="cart__content">
         `
         product.details.forEach(function(details){
-
-            console.log(details)
 
             htmlContent += `
                     <div class="cart__item__content">
@@ -80,32 +79,39 @@ getProductsLocalStorage = (products) => {
     return productsDatasOrder
 }
 
-//Récupère le contenu du local storage sous la forme d'un tableau d'objets
-getProductsFromLocalStorage = () => {
-    let productsFromLocalStorage = new Array
-    let idLocalStorage
-    let i = 0
-    for (let i=0; i<localStorage.length; i++) {
-        idLocalStorage = localStorage.key(i)
-        //console.log("Test : "+JSON.parse(localStorage.getItem(idLocalStorage)))
-        productsFromLocalStorage.push({
-            id : localStorage.key(i),
-            color: JSON.parse(localStorage.getItem(idLocalStorage))
+changeProductQuantity = (productsLocalStorage) => {
+    const elementsQuantity = document.getElementsByClassName("itemQuantity")
+    for (const element of elementsQuantity) {
+
+        element.addEventListener('click', () => {
+            updatePrices(productsLocalStorage, element)
         })
     }
-    //console.log(productsFromLocalStorage)
-    return productsFromLocalStorage
 }
 
-//Work in progress ...
-getProductValueFromLocalStorage = (orderValueLS) => {
-    let i = 0
-    while (i < orderValueLS.length) {
+/*
+    Met à jour les prix de la page
+*/
+updatePrices = (productsLocalStorage, element) => {
+    const productId = element.closest(".cart__item").getAttribute("data-id")
+    const productPrice = getProductPrice(productId, productsLocalStorage)
+    const newPrice = element.getAttribute("data-price") * element.value
+    
+    console.log("updatePrices")
+    console.log("productsLocalStorage : ", productsLocalStorage)
+    //console.log("element : ",element.getAttribute("data-price"))
+    console.log("newPrice", newPrice)
+    console.log(element.closest(".cart__item").getAttribute("data-id"))
+    //getProductData
+    //element.closest(".pricequantity").textContent = newPrice+" €"
+    //element.setAttribute("value", newPrice)
+}
 
-        if ( colorChoice == orderValueLS[i].color ) return i
-        i++
+const getProductPrice = (productId, productsLocalStorage) => {
+    console.log("getProductPrice")
+    for (const element of productsLocalStorage) {
+        console.log(element)
     }
-    return -1
 }
 
 /*
@@ -198,6 +204,34 @@ setOrder = (id, NewOrderValue) => {
     localStorage.setItem(id, OrderValueStringified)
 }
 
+//Récupère le contenu du local storage sous la forme d'un tableau d'objets
+_getProductsFromLocalStorage = () => {
+    let productsFromLocalStorage = new Array
+    let idLocalStorage
+    let i = 0
+    for (let i=0; i<localStorage.length; i++) {
+        idLocalStorage = localStorage.key(i)
+        //console.log("Test : "+JSON.parse(localStorage.getItem(idLocalStorage)))
+        productsFromLocalStorage.push({
+            id : localStorage.key(i),
+            color: JSON.parse(localStorage.getItem(idLocalStorage))
+        })
+    }
+    //console.log(productsFromLocalStorage)
+    return productsFromLocalStorage
+}
+
+//Work in progress ...
+getProductValueFromLocalStorage = (orderValueLS) => {
+    let i = 0
+    while (i < orderValueLS.length) {
+
+        if ( colorChoice == orderValueLS[i].color ) return i
+        i++
+    }
+    return -1
+}
+
 const main = async () => {
 
     //Enregistrement en dur pour les tests - A supprimer
@@ -205,28 +239,31 @@ const main = async () => {
     //localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
     //localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
     
-    //On récupère les données de tous les canapés depuis la BDD
-    
-    //Récupération des données de tous les produitss avec un argument vide passé en paramètre de la fonction <getMockedData>
+    //Récupération des données de tous les produits présents dans la BDD
     const productsData = await getMockedData("")
     
-    //Affichage de tous les produits
+    //Récupération de toutes les informations des produits présents dans le local storage
     const productsLocalStorage = getProductsLocalStorage(productsData)
     
-    //On affiche les canapés présents dans le localStorage
+    //Affichage des produits 
     displayProducts(productsLocalStorage)
 
     //BUG - voir _onClickAddQuantity
     //onClickAddQuantity()
 
-    //Début gestion des prix
-    const changeProductQuantity = document.getElementsByClassName("itemQuantity")
+    //test
+    changeProductQuantity(productsLocalStorage)
 
+    //Début gestion des prix
+    //const changeProductQuantity = document.getElementsByClassName("itemQuantity")
+
+    /*
     for (let i = 0; i < changeProductQuantity.length; i++) {
         changeProductQuantity[i].onclick = function () {
 
             console.log("Click change quantity")
 
+            
             let _id = this.closest("article").getAttribute("data-id")
             let colorChoice = this.closest("article").getAttribute("data-color")
 
@@ -243,29 +280,31 @@ const main = async () => {
             const index = valueLocalStorageById.map(object => object.color).indexOf(colorChoice)
 
             console.log("indexColorRow : "+index)
+            
 
-            /*
+            
             while () {
                 i++
             }
-            */
+            
             
             let newValueLocalStorage = {
 
             }
+
             //newOrderValue = {color: colorChoice, quantity: quantityChoice}
             //valueLocalStorage.push(NewOrderValue)
             //localStorage.setItem('myCat', 'Tom')
 
-            /*
+            
             productsFromLocalStorage.push({
                 id : localStorage.key(i),
                 color: JSON.parse(localStorage.getItem(idLocalStorage))
             })
-            */
+            
             //order.addOrder(productsDataPage)
 
-            /*
+            
             let currentProductBasicPrice = this.getAttribute("data-price")
             let newProductPriceQuantity = currentProductBasicPrice * this.value
             this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
@@ -281,9 +320,10 @@ const main = async () => {
 
             //changeProductQuantity[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
             document.getElementById("totalQuantity").innerHTML = countColorProductsFromLocalstorage
-            */
+            
         }
     }
+    */
 
     //Fin gestion des prix
 
