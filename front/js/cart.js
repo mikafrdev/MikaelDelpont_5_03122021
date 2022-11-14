@@ -2,9 +2,20 @@
     Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
     calcul le prix des articles en fonction des quantités sélectionnées
 */
-displayProducts = (productsData) => {
+displayProducts = (productsData, option) => {
 
     console.log("displayproductsDatas")
+
+    if (option == "refresh") {        
+        
+        //Supprime tous les enfant d'un élément
+        var element = document.getElementById("cart__items")
+        while (element.firstChild) {
+            //console.log(element.firstChild)
+            element.removeChild(element.firstChild)
+        }
+    }
+
     let htmlContent
 
     productsData.forEach(function(product){
@@ -29,7 +40,7 @@ displayProducts = (productsData) => {
                             <div class="cart__item__content__settings">
                                 <div class="cart__item__content__settings__quantity">
                                     <p>Qté : ${details.quantity}</p>
-                                    <input data-price="${product.price}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details.quantity}" />
+                                    <input data-price="${product.price}" data-color="${details.color}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details.quantity}" />
                                 </div>
                                 <div class="cart__item__content__settings__delete">
                                     <p class="deleteItem" data-id="${product.id}" data-color="${details.color}">Supprimer</p>
@@ -44,13 +55,28 @@ displayProducts = (productsData) => {
 
             </article>
             `
-        document.querySelector('#cart__items').insertAdjacentHTML('afterend', htmlContent)
+        document.querySelector('#cart__items').insertAdjacentHTML('afterbegin', htmlContent)
     })
+}
+
+/*
+
+*/
+const getProductValueLocalStorage = (productId) => {
+    console.log("getProductValueLocalStorage")
+    const valueLocalStorage = JSON.parse(localStorage.getItem(productId))
+    return valueLocalStorage
+}
+
+const setProductValueLocalStorage = (productId, valueLocalStorage) => {
+    console.log("setProductValueLocalStorage")
+    let valueLocalStorageStringified = JSON.stringify(valueLocalStorage)
+    localStorage.setItem(productId, valueLocalStorageStringified)
 }
 
 
 //Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
-getProductsLocalStorage = (products) => {
+const getAllProductsDataLocalStorage = (products) => {
     let order = new Array
     let productsDatasOrder = new Array
 
@@ -83,8 +109,33 @@ changeProductQuantity = (productsLocalStorage) => {
     const elementsQuantity = document.getElementsByClassName("itemQuantity")
     for (const element of elementsQuantity) {
 
-        element.addEventListener('click', () => {
-            updatePrices(productsLocalStorage, element)
+        element.addEventListener('change', () => {
+
+            let productColor = element.getAttribute("data-color")
+
+            const productId = element.closest(".cart__item").getAttribute("data-id")
+            let ProductValueLocalStorage = new Array
+            ProductValueLocalStorage = getProductValueLocalStorage(productId)
+            
+            console.log("ProductValueLocalStorage", ProductValueLocalStorage)
+
+            let index = ProductValueLocalStorage.findIndex(function(todo, index) {
+                return todo.color == productColor
+            })
+
+            newProductDetail = {
+                color : productColor,
+                quantity : element.value
+            }
+
+            ProductValueLocalStorage.splice(index, 1, newProductDetail)
+
+            console.log("ProductValueLocalStorage", ProductValueLocalStorage)
+
+            setProductValueLocalStorage(productId, ProductValueLocalStorage)
+
+            displayProducts(productsLocalStorage, "refresh")
+
         })
     }
 }
@@ -243,13 +294,10 @@ const main = async () => {
     const productsData = await getMockedData("")
     
     //Récupération de toutes les informations des produits présents dans le local storage
-    const productsLocalStorage = getProductsLocalStorage(productsData)
+    const productsLocalStorage = getAllProductsDataLocalStorage(productsData)
     
     //Affichage des produits 
-    displayProducts(productsLocalStorage)
-
-    //BUG - voir _onClickAddQuantity
-    //onClickAddQuantity()
+    displayProducts(productsLocalStorage, "init")
 
     //test
     changeProductQuantity(productsLocalStorage)
