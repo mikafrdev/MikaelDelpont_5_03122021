@@ -56,6 +56,7 @@ checkOrder = () => {
     if (this.colorSelected != "" && this.quantitySelected != 0) {
 
         console.log("Formulaire valide")
+        alert("L'article a été ajouté dans le panier")
     }else{
         console.log("Formulaire KO : PB sélection couleur ou quantité")
     }

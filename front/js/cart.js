@@ -96,7 +96,7 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
 
     for (const element of elementsQuantity) {
 
-        element.addEventListener('click', () => {
+        element.addEventListener('change', () => {
 
             let productColor = element.getAttribute("data-color")
 
@@ -120,8 +120,6 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
             console.log("ProductValueLocalStorage", ProductValueLocalStorage)
 
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
-
-            //displayProducts(productsLocalStorage, "refresh")
 
         })
     }

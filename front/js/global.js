@@ -64,8 +64,10 @@ setOrder = (product) => {
         let OrderValueStringified = JSON.stringify(newOrderValue)
         localStorage.setItem(product._id, OrderValueStringified)
 
+        alert("L'article a été ajouté dans le panier")
+
     //Si le formulaire n'est pas valide
     }else{
-        alert("Formulaire non valide")
+        alert("La couleur et/ou le nombre d'articles n'on pas été renseignés")
     }
 }
