@@ -195,100 +195,6 @@ _deleteOrder = () => {
     }
 }
 
-//Work in progress
-_setPricebyProduct = () => {
-    const changeProductsPrice = document.getElementsByClassName("deleteItem")
-    changeProductsPrice.forEach(element => {
-        console.log("TEST : ", changeProductsPrice[element])
-    })
-}
-
-test_resetDisplay = () => {        
-    //Supprime tous les enfant d'un élément
-    var element = document.getElementById("cart__items")
-    while (element.firstChild) {
-        element.removeChild(element.firstChild)
-    }
-}
-
-test_displayProducts = (productsLocalStorage) => {
-    console.log("test_displayproductsDatas")
-
-    let htmlContent
-
-    productsLocalStorage.forEach(function(product){
-
-        htmlContent = `
-            <article class="cart__item" data-id="${product.id}">
-
-                <div class="cart__item__img">
-                    <h2>${product.name}</h2>
-                    <img src="${product.imageUrl}" alt="${product.altTxt}" />
-                </div>
-
-                <div class="cart__content">
-        `
-        product.details.forEach(function(details){
-
-            htmlContent += `
-                    <div class="cart__item__content">
-                        <div class="cart__item__content__description">
-                            <p>${details.color}</p>
-                            <p class="pricequantity">${product.price * details.quantity} €</p>
-                            <div class="cart__item__content__settings">
-                                <div class="cart__item__content__settings__quantity">
-                                    <p>Qté : ${details.quantity}</p>
-                                    <input data-price="${product.price}" data-color="${details.color}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details.quantity}" />
-                                </div>
-                                <div class="cart__item__content__settings__delete">
-                                    <p class="deleteItem" data-id="${product.id}" data-color="${details.color}">Supprimer</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            `
-        })
-        htmlContent += `
-                </div>
-
-            </article>
-            `
-        document.querySelector('#cart__items').insertAdjacentHTML('afterbegin', htmlContent)
-    })
-
-}
-
-test_changeProductQuantity = () => {
-
-    console.log("test_changeProductQuantity", this)
-        
-    let productColor = element.getAttribute("data-color")
-    const productId = element.closest(".cart__item").getAttribute("data-id")
-    let ProductValueLocalStorage = new Array
-    ProductValueLocalStorage = getProductValueLocalStorage(productId)
-    
-    console.log("ProductValueLocalStorage", ProductValueLocalStorage)
-
-    let index = ProductValueLocalStorage.findIndex(function(todo, index) {
-        return todo.color == productColor
-    })
-
-    newProductDetail = {
-        color : productColor,
-        quantity : element.value
-    }
-
-    ProductValueLocalStorage.splice(index, 1, newProductDetail)
-
-    console.log("ProductValueLocalStorage", ProductValueLocalStorage)
-
-    setProductValueLocalStorage(productId, ProductValueLocalStorage)
-
-    //displayProducts(productsLocalStorage, "refresh")
-    //test(productsLocalStorage, "refresh")
-
-}
-
 deleteOrder = () => {       
     let deleteElement = document.getElementsByClassName("deleteItem")
 
@@ -304,6 +210,7 @@ deleteOrder = () => {
               
                 for (const node of children) {
                   console.log("node", node)
+                  //element.removeChild(element.firstChild)
                 }
               }
 
@@ -340,19 +247,7 @@ const main = async () => {
     displayProducts(productsLocalStorage, "init")
     
     const elementsQuantity = document.getElementsByClassName("itemQuantity")
-    changeProductQuantity(productsLocalStorage, elementsQuantity)    
-
-    /*
-    for (const element of elementsQuantity) {
-
-        element.addEventListener('click', (evt) => test(element, this))
-
-        //element.addEventListener('click', test_changeProductQuantity)
-
-        //element.addEventListener('click', test_resetDisplay)
-        //element.addEventListener('click', test_displayProducts)
-        //element.addEventListener('click', test_changeProductQuantity)
-    }*/
+    changeProductQuantity(productsLocalStorage, elementsQuantity)
 
     //order.setPricebyProduct()
     deleteOrder()
