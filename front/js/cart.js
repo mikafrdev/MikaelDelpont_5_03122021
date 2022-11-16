@@ -2,23 +2,13 @@
     Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
     calcul le prix des articles en fonction des quantités sélectionnées
 */
-displayProducts = (productsData, option) => {
+displayProducts = (productsLocalStorage, option) => {
 
     console.log("displayproductsDatas")
 
-    if (option == "refresh") {        
-        
-        //Supprime tous les enfant d'un élément
-        var element = document.getElementById("cart__items")
-        while (element.firstChild) {
-            //console.log(element.firstChild)
-            element.removeChild(element.firstChild)
-        }
-    }
-
     let htmlContent
 
-    productsData.forEach(function(product){
+    productsLocalStorage.forEach(function(product){
 
         htmlContent = `
             <article class="cart__item" data-id="${product.id}">
@@ -59,9 +49,6 @@ displayProducts = (productsData, option) => {
     })
 }
 
-/*
-
-*/
 const getProductValueLocalStorage = (productId) => {
     console.log("getProductValueLocalStorage")
     const valueLocalStorage = JSON.parse(localStorage.getItem(productId))
@@ -105,11 +92,11 @@ const getAllProductsDataLocalStorage = (products) => {
     return productsDatasOrder
 }
 
-changeProductQuantity = (productsLocalStorage) => {
-    const elementsQuantity = document.getElementsByClassName("itemQuantity")
+changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
+
     for (const element of elementsQuantity) {
 
-        element.addEventListener('change', () => {
+        element.addEventListener('click', () => {
 
             let productColor = element.getAttribute("data-color")
 
@@ -134,7 +121,7 @@ changeProductQuantity = (productsLocalStorage) => {
 
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
 
-            displayProducts(productsLocalStorage, "refresh")
+            //displayProducts(productsLocalStorage, "refresh")
 
         })
     }
@@ -171,7 +158,7 @@ const getProductPrice = (productId, productsLocalStorage) => {
     - Si plusieurs couleurs sont renseignées, on ne supprime que la ligne concernée
     - Les informations du localStorage sont mise à jour
 */
-deleteOrder = () => {
+_deleteOrder = () => {
     console.log("deleteOrder")
     let deleteLinks = document.getElementsByClassName("deleteItem")
 
@@ -216,71 +203,124 @@ _setPricebyProduct = () => {
     })
 }
 
-//BUG
-_onClickAddQuantity = () => {
-    const changeProductQuantity = document.getElementsByClassName("itemQuantity")
-
-    for (let i = 0; i < changeProductQuantity.length; i++) {
-        changeProductQuantity[i].onclick = function () {
-
-            let currentProductBasicPrice = this.getAttribute("data-price")
-            let newProductPriceQuantity = currentProductBasicPrice * this.value
-            this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
-
-            //A VOIR AVEC DIDIER
-            let productsFromLocalStorage = this.getProductsFromLocalStorage()
-            let countColorProductsFromLocalstorage = 0
-            
-            for (let j = 0; j < productsFromLocalStorage.length; j++) {
-                for (let k = 0; k < productsFromLocalStorage[j].color.length; k++) {
-                    countColorProductsFromLocalstorage += parseInt(productsFromLocalStorage[j].color[k].quantity)
-                }
-            }
-
-            //changeProductQuantity[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
-            document.getElementById("totalQuantity").innerHTML = countColorProductsFromLocalstorage
-        }
+test_resetDisplay = () => {        
+    //Supprime tous les enfant d'un élément
+    var element = document.getElementById("cart__items")
+    while (element.firstChild) {
+        element.removeChild(element.firstChild)
     }
 }
 
-//WIP...
-getQuantityFromLocalStorage = (Products) => {
+test_displayProducts = (productsLocalStorage) => {
+    console.log("test_displayproductsDatas")
+
+    let htmlContent
+
+    productsLocalStorage.forEach(function(product){
+
+        htmlContent = `
+            <article class="cart__item" data-id="${product.id}">
+
+                <div class="cart__item__img">
+                    <h2>${product.name}</h2>
+                    <img src="${product.imageUrl}" alt="${product.altTxt}" />
+                </div>
+
+                <div class="cart__content">
+        `
+        product.details.forEach(function(details){
+
+            htmlContent += `
+                    <div class="cart__item__content">
+                        <div class="cart__item__content__description">
+                            <p>${details.color}</p>
+                            <p class="pricequantity">${product.price * details.quantity} €</p>
+                            <div class="cart__item__content__settings">
+                                <div class="cart__item__content__settings__quantity">
+                                    <p>Qté : ${details.quantity}</p>
+                                    <input data-price="${product.price}" data-color="${details.color}" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${details.quantity}" />
+                                </div>
+                                <div class="cart__item__content__settings__delete">
+                                    <p class="deleteItem" data-id="${product.id}" data-color="${details.color}">Supprimer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            `
+        })
+        htmlContent += `
+                </div>
+
+            </article>
+            `
+        document.querySelector('#cart__items').insertAdjacentHTML('afterbegin', htmlContent)
+    })
 
 }
 
-//Work in progress
-setOrder = (id, NewOrderValue) => {
-    JSON.stringify(OrderValueStringified)
-    let OrderValueStringified = JSON.stringify(NewOrderValue)
-    localStorage.setItem(id, OrderValueStringified)
+test_changeProductQuantity = () => {
+
+    console.log("test_changeProductQuantity", this)
+        
+    let productColor = element.getAttribute("data-color")
+    const productId = element.closest(".cart__item").getAttribute("data-id")
+    let ProductValueLocalStorage = new Array
+    ProductValueLocalStorage = getProductValueLocalStorage(productId)
+    
+    console.log("ProductValueLocalStorage", ProductValueLocalStorage)
+
+    let index = ProductValueLocalStorage.findIndex(function(todo, index) {
+        return todo.color == productColor
+    })
+
+    newProductDetail = {
+        color : productColor,
+        quantity : element.value
+    }
+
+    ProductValueLocalStorage.splice(index, 1, newProductDetail)
+
+    console.log("ProductValueLocalStorage", ProductValueLocalStorage)
+
+    setProductValueLocalStorage(productId, ProductValueLocalStorage)
+
+    //displayProducts(productsLocalStorage, "refresh")
+    //test(productsLocalStorage, "refresh")
+
 }
 
-//Récupère le contenu du local storage sous la forme d'un tableau d'objets
-_getProductsFromLocalStorage = () => {
-    let productsFromLocalStorage = new Array
-    let idLocalStorage
-    let i = 0
-    for (let i=0; i<localStorage.length; i++) {
-        idLocalStorage = localStorage.key(i)
-        //console.log("Test : "+JSON.parse(localStorage.getItem(idLocalStorage)))
-        productsFromLocalStorage.push({
-            id : localStorage.key(i),
-            color: JSON.parse(localStorage.getItem(idLocalStorage))
+deleteOrder = () => {       
+    let deleteElement = document.getElementsByClassName("deleteItem")
+
+    for (const element of deleteElement) {
+
+        element.addEventListener('click', () => {
+            console.log("deleteOrder")
+            
+            let productContainer = element.closest(".cart__item")
+
+            if (productContainer.hasChildNodes()) {
+                let children = productContainer.childNodes
+              
+                for (const node of children) {
+                  console.log("node", node)
+                }
+              }
+
+            //console.log("rowToDelete", rowToDelete)
         })
     }
-    //console.log(productsFromLocalStorage)
-    return productsFromLocalStorage
-}
 
-//Work in progress ...
-getProductValueFromLocalStorage = (orderValueLS) => {
-    let i = 0
-    while (i < orderValueLS.length) {
 
-        if ( colorChoice == orderValueLS[i].color ) return i
-        i++
+
+    /*
+    //Supprime tous les enfant d'un élément
+    var element = document.getElementById("cart__items")
+    while (element.firstChild) {
+        element.removeChild(element.firstChild)
     }
-    return -1
+    */
+    
 }
 
 const main = async () => {
@@ -298,82 +338,21 @@ const main = async () => {
     
     //Affichage des produits 
     displayProducts(productsLocalStorage, "init")
-
-    //test
-    changeProductQuantity(productsLocalStorage)
-
-    //Début gestion des prix
-    //const changeProductQuantity = document.getElementsByClassName("itemQuantity")
+    
+    const elementsQuantity = document.getElementsByClassName("itemQuantity")
+    changeProductQuantity(productsLocalStorage, elementsQuantity)    
 
     /*
-    for (let i = 0; i < changeProductQuantity.length; i++) {
-        changeProductQuantity[i].onclick = function () {
+    for (const element of elementsQuantity) {
 
-            console.log("Click change quantity")
+        element.addEventListener('click', (evt) => test(element, this))
 
-            
-            let _id = this.closest("article").getAttribute("data-id")
-            let colorChoice = this.closest("article").getAttribute("data-color")
+        //element.addEventListener('click', test_changeProductQuantity)
 
-            let valueLocalStorageById = JSON.parse(localStorage.getItem(_id))
-
-            const _index = valueLocalStorageById.findIndex(object => {
-                console.log(object.color)
-                console.log(colorChoice)
-                return object.color == colorChoice
-            })
-
-            console.log(valueLocalStorageById)
-
-            const index = valueLocalStorageById.map(object => object.color).indexOf(colorChoice)
-
-            console.log("indexColorRow : "+index)
-            
-
-            
-            while () {
-                i++
-            }
-            
-            
-            let newValueLocalStorage = {
-
-            }
-
-            //newOrderValue = {color: colorChoice, quantity: quantityChoice}
-            //valueLocalStorage.push(NewOrderValue)
-            //localStorage.setItem('myCat', 'Tom')
-
-            
-            productsFromLocalStorage.push({
-                id : localStorage.key(i),
-                color: JSON.parse(localStorage.getItem(idLocalStorage))
-            })
-            
-            //order.addOrder(productsDataPage)
-
-            
-            let currentProductBasicPrice = this.getAttribute("data-price")
-            let newProductPriceQuantity = currentProductBasicPrice * this.value
-            this.parentNode.firstElementChild.innerHTML = "Qté : "+this.value
-
-            let productsFromLocalStorage = order.getProductsFromLocalStorage()
-            let countColorProductsFromLocalstorage = 0
-            
-            for (let j = 0; j < productsFromLocalStorage.length; j++) {
-                for (let k = 0; k < productsFromLocalStorage[j].color.length; k++) {
-                    countColorProductsFromLocalstorage += parseInt(productsFromLocalStorage[j].color[k].quantity)
-                }
-            }
-
-            //changeProductQuantity[i].closest(".cart__item__content__description").children[1].innerHTML = newProductPriceQuantity+" €"
-            document.getElementById("totalQuantity").innerHTML = countColorProductsFromLocalstorage
-            
-        }
-    }
-    */
-
-    //Fin gestion des prix
+        //element.addEventListener('click', test_resetDisplay)
+        //element.addEventListener('click', test_displayProducts)
+        //element.addEventListener('click', test_changeProductQuantity)
+    }*/
 
     //order.setPricebyProduct()
     deleteOrder()
