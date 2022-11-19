@@ -4,7 +4,17 @@
 */
 displayProducts = (productsLocalStorage, option) => {
 
-    console.log("displayproductsDatas")
+    console.log("displayProducts")
+
+    if (option == "refresh") {        
+
+        //Supprime tous les enfant d'un élément
+        var element = document.getElementById("cart__items")
+        while (element.firstChild) {
+            //console.log(element.firstChild)
+            element.removeChild(element.firstChild)
+        }
+    }
 
     let htmlContent
 
@@ -94,12 +104,13 @@ const getAllProductsDataLocalStorage = (products) => {
 
 changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
 
+    console.log("changeProductQuantity demandé !")
+
     for (const element of elementsQuantity) {
 
-        element.addEventListener('change', () => {
+        element.addEventListener('click', () => {
 
             let productColor = element.getAttribute("data-color")
-
             const productId = element.closest(".cart__item").getAttribute("data-id")
             let ProductValueLocalStorage = new Array
             ProductValueLocalStorage = getProductValueLocalStorage(productId)
@@ -120,6 +131,9 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
             console.log("ProductValueLocalStorage", ProductValueLocalStorage)
 
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
+
+            
+            displayProducts(productsLocalStorage, "init")
 
         })
     }
@@ -215,9 +229,6 @@ deleteOrder = () => {
             //console.log("rowToDelete", rowToDelete)
         })
     }
-
-
-
     /*
     //Supprime tous les enfant d'un élément
     var element = document.getElementById("cart__items")
@@ -225,7 +236,36 @@ deleteOrder = () => {
         element.removeChild(element.firstChild)
     }
     */
+}
+
+updatePrices = () => {
+    console.log("updatePrices")
+    const productsPrices = document.getElementsByClassName("pricequantity")
+    const totalQuantity = document.getElementById("totalQuantity")
+    const totalPrice = document.getElementById("totalPrice")
     
+    let productPriceCleaned = 0
+
+    for (const productNode of productsPrices) {
+        productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
+    }
+    console.log("TOTAL : ", productPriceCleaned)
+    totalPrice.innerHTML = productPriceCleaned
+}
+
+_updateQuantities = () => {
+    console.log("updatePrices")
+    const productsPrices = document.getElementsByClassName("pricequantity")
+    const totalQuantity = document.getElementById("totalQuantity")
+    const totalPrice = document.getElementById("totalPrice")
+    
+    let productPriceCleaned = 0
+
+    for (const productNode of productsPrices) {
+        productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
+    }
+    console.log("TOTAL : ", productPriceCleaned)
+    totalPrice.innerHTML = productPriceCleaned
 }
 
 const main = async () => {
@@ -249,6 +289,8 @@ const main = async () => {
 
     //order.setPricebyProduct()
     deleteOrder()
+
+    updatePrices()
 }
 
 main()

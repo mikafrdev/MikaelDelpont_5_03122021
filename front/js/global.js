@@ -68,6 +68,6 @@ setOrder = (product) => {
 
     //Si le formulaire n'est pas valide
     }else{
-        alert("La couleur et/ou le nombre d'articles n'on pas été renseignés")
+        alert("La couleur et/ou le nombre d'articles n'ont pas été renseignés")
     }
 }
