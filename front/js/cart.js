@@ -241,7 +241,6 @@ deleteOrder = () => {
 updatePrices = () => {
     console.log("updatePrices")
     const productsPrices = document.getElementsByClassName("pricequantity")
-    const totalQuantity = document.getElementById("totalQuantity")
     const totalPrice = document.getElementById("totalPrice")
     
     let productPriceCleaned = 0
@@ -249,23 +248,22 @@ updatePrices = () => {
     for (const productNode of productsPrices) {
         productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
     }
-    console.log("TOTAL : ", productPriceCleaned)
+    console.log("TOTAL PRIX : ", productPriceCleaned)
     totalPrice.innerHTML = productPriceCleaned
 }
 
-_updateQuantities = () => {
-    console.log("updatePrices")
-    const productsPrices = document.getElementsByClassName("pricequantity")
+updateQuantities = () => {
+    console.log("updateQuantities")
     const totalQuantity = document.getElementById("totalQuantity")
-    const totalPrice = document.getElementById("totalPrice")
+    const productsQuantity = document.getElementsByClassName("itemQuantity")
     
-    let productPriceCleaned = 0
+    let productQuantityCleaned = 0
 
-    for (const productNode of productsPrices) {
-        productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
+    for (const productNode of productsQuantity) {
+        productQuantityCleaned = productQuantityCleaned + parseInt(productNode.value.substring(0, productNode.value.length))
     }
-    console.log("TOTAL : ", productPriceCleaned)
-    totalPrice.innerHTML = productPriceCleaned
+    console.log("TOTAL QUANTITES : ", productQuantityCleaned)
+    totalQuantity.innerHTML = productQuantityCleaned
 }
 
 const main = async () => {
@@ -291,6 +289,7 @@ const main = async () => {
     deleteOrder()
 
     updatePrices()
+    updateQuantities()
 }
 
 main()
