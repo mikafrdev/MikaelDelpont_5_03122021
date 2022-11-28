@@ -266,6 +266,92 @@ updateQuantities = () => {
     totalQuantity.innerHTML = productQuantityCleaned
 }
 
+checkForm = (inputName) => {
+
+    console.log("checkForm", this)
+
+    if (inputName) {
+        
+    }
+
+
+    let isValid = false
+
+    if (element.name == "firstName" || element.id == "formUser") {
+        //'^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$'
+        let FirstNameRegExp = new RegExp('[a-zA-Z][^0-9]')
+        let testFirstName = FirstNameRegExp.test(element.value)
+
+        if(testFirstName) {
+            element.nextElementSibling.innerHTML = ""
+            console.log("Prénom valide")
+            isValid = true
+        }else{
+            element.nextElementSibling.innerHTML = "Prénom invalide"
+            console.log("Prénom non valide")
+            isValid = false
+        }
+    }
+    if (element.name == "lastName" || element.id == "formUser") {
+        let lastNameRegExp = new RegExp('[a-zA-Z][^0-9]')
+        let testLastName = lastNameRegExp.test(element.value)
+
+        if(testLastName) {
+            element.nextElementSibling.innerHTML = ""
+            console.log("Nom valide")
+            isValid = true
+        }else{
+            element.nextElementSibling.innerHTML = "Nom invalide"
+            console.log("Nom non valide")
+            isValid = false
+        }
+    }
+    if (element.name == "address" || element.id == "formUser") {
+        let addressRegExp = new RegExp('[a-zA-Z0-9]')
+        let testAddress = addressRegExp.test(element.value)
+
+        if(testAddress) {
+            element.nextElementSibling.innerHTML = ""
+            console.log("Adresse valide")
+            isValid = true
+        }else{
+            element.nextElementSibling.innerHTML = "Adresse invalide"
+            console.log("Adresse non valide")
+            isValid = false
+        }
+    }
+    if (element.name == "city" || element.id == "formUser") {
+        let cityRegExp = new RegExp('[a-zA-Z]')
+        let testcity = cityRegExp.test(element.value)
+
+        if(testcity) {
+            element.nextElementSibling.innerHTML = ""
+            console.log("Ville valide")
+            isValid = true
+        }else{
+            element.nextElementSibling.innerHTML = "Ville invalide"
+            console.log("Ville non valide")
+            isValid = false
+        }
+    }
+    if (element.name == "email" || element.id == "formUser") {
+        //'^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$'
+        let emailRegExp = new RegExp('[a-zA-Z0-9]')
+        let testEmail = emailRegExp.test(element.value)
+
+        if(testEmail) {
+            element.nextElementSibling.innerHTML = ""
+            console.log("Adresse valide")
+            isValid = true
+        }else{
+            element.nextElementSibling.innerHTML = "Adresse invalide"
+            console.log("Adresse non valide")
+            isValid = false
+        }
+    }
+    return isValid
+}
+
 const main = async () => {
 
     //Enregistrement en dur pour les tests - A supprimer
@@ -290,6 +376,30 @@ const main = async () => {
 
     updatePrices()
     updateQuantities()
+
+    /*************** Gestion des champs du formulaire ***************/
+    const formInputs = document.querySelectorAll('#formUser input')
+
+    let isValid = false
+
+    for (const formInput of formInputs) {
+        formInput.addEventListener('change', function() {
+            isValid = checkForm(this.name)
+            console.log("isValid input response : ", isValid)
+        })
+    }
+
+    /*************** Ecouter le clic sur le submit du formulaire ***************/
+
+    formUser.addEventListener('submit', function (event) {
+        //Empêche le formulaire d'être exécuté
+        event.preventDefault()
+        isValid = checkForm()
+        console.log("isValid form response : ", isValid)
+
+        //if( validPrenom(form.prenom) && validNom(form.nom)&& validAdresse(form.adresse) && validVille(form.ville) && validEmail(form.email) ) {
+
+    })
 }
 
 main()
