@@ -266,21 +266,16 @@ updateQuantities = () => {
     totalQuantity.innerHTML = productQuantityCleaned
 }
 
-checkForm = (inputName) => {
+_checkForm = (inputFirstName, inputLastName, inputAdress, inputCity, inputEmail) => {
 
-    console.log("checkForm", this)
-
-    if (inputName) {
-        
-    }
-
+    console.log("checkForm")
 
     let isValid = false
 
-    if (element.name == "firstName" || element.id == "formUser") {
+    if (inputFirstName.name == "firstName") {
         //'^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$'
         let FirstNameRegExp = new RegExp('[a-zA-Z][^0-9]')
-        let testFirstName = FirstNameRegExp.test(element.value)
+        let testFirstName = FirstNameRegExp.test(inputFirstName.value)
 
         if(testFirstName) {
             element.nextElementSibling.innerHTML = ""
@@ -292,9 +287,9 @@ checkForm = (inputName) => {
             isValid = false
         }
     }
-    if (element.name == "lastName" || element.id == "formUser") {
+    if (inputLastName.name == "lastName") {
         let lastNameRegExp = new RegExp('[a-zA-Z][^0-9]')
-        let testLastName = lastNameRegExp.test(element.value)
+        let testLastName = lastNameRegExp.test(inputLastName.value)
 
         if(testLastName) {
             element.nextElementSibling.innerHTML = ""
@@ -306,9 +301,9 @@ checkForm = (inputName) => {
             isValid = false
         }
     }
-    if (element.name == "address" || element.id == "formUser") {
+    if (inputAdress.name == "address") {
         let addressRegExp = new RegExp('[a-zA-Z0-9]')
-        let testAddress = addressRegExp.test(element.value)
+        let testAddress = addressRegExp.test(inputAdress.value)
 
         if(testAddress) {
             element.nextElementSibling.innerHTML = ""
@@ -320,9 +315,9 @@ checkForm = (inputName) => {
             isValid = false
         }
     }
-    if (element.name == "city" || element.id == "formUser") {
+    if (inputCity.name == "city") {
         let cityRegExp = new RegExp('[a-zA-Z]')
-        let testcity = cityRegExp.test(element.value)
+        let testcity = cityRegExp.test(inputCity.value)
 
         if(testcity) {
             element.nextElementSibling.innerHTML = ""
@@ -334,10 +329,10 @@ checkForm = (inputName) => {
             isValid = false
         }
     }
-    if (element.name == "email" || element.id == "formUser") {
+    if (inputEmail.name == "email") {
         //'^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$'
         let emailRegExp = new RegExp('[a-zA-Z0-9]')
-        let testEmail = emailRegExp.test(element.value)
+        let testEmail = emailRegExp.test(inputEmail.value)
 
         if(testEmail) {
             element.nextElementSibling.innerHTML = ""
@@ -378,28 +373,124 @@ const main = async () => {
     updateQuantities()
 
     /*************** Gestion des champs du formulaire ***************/
-    const formInputs = document.querySelectorAll('#formUser input')
-
-    let isValid = false
+    
+    
+  
+    /*
+    checkForm(inputFirstName, inputLastName, inputAdress, inputCity, inputEmail)
 
     for (const formInput of formInputs) {
         formInput.addEventListener('change', function() {
-            isValid = checkForm(this.name)
+            //isValid = checkForm(this.name)
+            if (element.name == "firstName") {
+                //'^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$'
+                let FirstNameRegExp = new RegExp('[a-zA-Z][^0-9]')
+                let testFirstName = FirstNameRegExp.test(element.value)
+        
+                if(testFirstName) {
+                    element.nextElementSibling.innerHTML = ""
+                    console.log("Prénom valide")
+                    isValid = true
+                }else{
+                    element.nextElementSibling.innerHTML = "Prénom invalide"
+                    console.log("Prénom non valide")
+                    isValid = false
+                }
+            }
             console.log("isValid input response : ", isValid)
         })
     }
+    */
+    
 
     /*************** Ecouter le clic sur le submit du formulaire ***************/
+
+    const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
 
     formUser.addEventListener('submit', function (event) {
         //Empêche le formulaire d'être exécuté
         event.preventDefault()
-        isValid = checkForm()
+        isValid = checkForm(formInputs)
         console.log("isValid form response : ", isValid)
 
         //if( validPrenom(form.prenom) && validNom(form.nom)&& validAdresse(form.adresse) && validVille(form.ville) && validEmail(form.email) ) {
 
     })
+
+    checkForm = (formInputs) => {
+        let isValid = true
+        for (const formInput of formInputs) {
+            let inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            let testInput = inputRegExp.test(formInput.value)
+    
+            if(testInput) {
+                formInput.nextElementSibling.innerHTML = ""
+                console.log("Prénom valide")
+            }else{
+                formInput.nextElementSibling.innerHTML = formInput.name+" invalide"
+                console.log("Prénom non valide")
+                isValid = false
+            }
+        }
+        if(isValid) {
+            const r = fetch('https://jsonplaceholder.typicode.com/todos/1')
+            console.log(r)
+
+
+
+
+/*
+            fetch('https://jsonplaceholder.typicode.com/todos/1')
+                .then(response => response.json())
+                .then(json => console.log(json))
+                */
+        }
+    }
+
+    async function fetchProducts() {
+        const res = await fetch('https://jsonplaceholder.typicode.com/users')
+        if (res.ok === true) {
+            return res.json
+        }else{
+            throw new Error('Impossible de contexter le server')
+        }
+    }
+
+    let order = {
+        orderId : orderId,
+        firstName : firstName,
+        lastName : lastName,
+        address : address,
+        city : city,
+        email : email,
+        productID : []
+    }
+
+    async function fetchProducts() {
+        const res = await fetch('http://localhost:3000/api/order/', {
+            method: 'POST',
+            headers: {
+                "Accept": "application/json",
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            body: JSON.stringify({order})
+        })
+        .then(res => res.json())
+        /*
+        if (res.ok === true) {
+            return res.json
+        }else{
+            throw new Error('Impossible de contexter le server')
+        }
+        */
+    }
+    fetchProducts().then(users => console.log(users))
+
+    /*
+    ('https://jsonplaceholder.typicode.com/users')
+        .then(r => r.json())
+        .then(body => console.log(body))
+        */
 }
 
 main()
