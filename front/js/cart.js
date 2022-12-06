@@ -372,37 +372,6 @@ const main = async () => {
     updatePrices()
     updateQuantities()
 
-    /*************** Gestion des champs du formulaire ***************/
-    
-    
-  
-    /*
-    checkForm(inputFirstName, inputLastName, inputAdress, inputCity, inputEmail)
-
-    for (const formInput of formInputs) {
-        formInput.addEventListener('change', function() {
-            //isValid = checkForm(this.name)
-            if (element.name == "firstName") {
-                //'^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$'
-                let FirstNameRegExp = new RegExp('[a-zA-Z][^0-9]')
-                let testFirstName = FirstNameRegExp.test(element.value)
-        
-                if(testFirstName) {
-                    element.nextElementSibling.innerHTML = ""
-                    console.log("Prénom valide")
-                    isValid = true
-                }else{
-                    element.nextElementSibling.innerHTML = "Prénom invalide"
-                    console.log("Prénom non valide")
-                    isValid = false
-                }
-            }
-            console.log("isValid input response : ", isValid)
-        })
-    }
-    */
-    
-
     /*************** Ecouter le clic sur le submit du formulaire ***************/
 
     const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
@@ -412,85 +381,116 @@ const main = async () => {
         event.preventDefault()
         isValid = checkForm(formInputs)
         console.log("isValid form response : ", isValid)
-
-        //if( validPrenom(form.prenom) && validNom(form.nom)&& validAdresse(form.adresse) && validVille(form.ville) && validEmail(form.email) ) {
-
     })
 
     checkForm = (formInputs) => {
+        let inputRegExp
+        let testInput    
         let isValid = true
         for (const formInput of formInputs) {
-            let inputRegExp = new RegExp('[a-zA-Z][^0-9]')
-            let testInput = inputRegExp.test(formInput.value)
-    
+            if (formInput.name == "firstName" || formInput.name == "lastName") inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            if (formInput.name == "adress") inputRegExp = new RegExp('[a-zA-Z0-9]')
+            if (formInput.name == "city") inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            if (formInput.name == "email") inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+                
+            testInput = inputRegExp.test(formInput.value)    
             if(testInput) {
                 formInput.nextElementSibling.innerHTML = ""
-                console.log("Prénom valide")
+                console.log(formInput.name+" valide")
             }else{
                 formInput.nextElementSibling.innerHTML = formInput.name+" invalide"
-                console.log("Prénom non valide")
+                console.log(formInput.name+" invalide")
                 isValid = false
             }
-        }
-        if(isValid) {
+            /*
             const r = fetch('https://jsonplaceholder.typicode.com/todos/1')
             console.log(r)
 
-
-
-
-/*
             fetch('https://jsonplaceholder.typicode.com/todos/1')
                 .then(response => response.json())
                 .then(json => console.log(json))
-                */
+            */
         }
+        return isValid
     }
 
-    async function fetchProducts() {
-        const res = await fetch('https://jsonplaceholder.typicode.com/users')
-        if (res.ok === true) {
-            return res.json
-        }else{
-            throw new Error('Impossible de contexter le server')
-        }
-    }
-
-    let order = {
-        orderId : orderId,
-        firstName : firstName,
+    let contact = {
+        /*firstName : firstName,
         lastName : lastName,
         address : address,
         city : city,
         email : email,
-        productID : []
+        products : []*/
+        firstName : "test",
+        lastName : "test",
+        address : "1 rue du test",
+        city : "Ville-test",
+        email : "unemail@testemail.com"
     }
 
+    let products = ["034707184e8e4eefb46400b5a3774b5f"]
+
+    //console.log("products : ", contact, products)
+
+    let response = await fetch('http://localhost:3000/api/order/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(contact, products)
+      });
+      
+      let result = await response.json();
+      alert(result.message);
+
+    /*
     async function fetchProducts() {
-        const res = await fetch('http://localhost:3000/api/order/', {
+        const res = await fetch('http://localhost:3000/api/order', {
             method: 'POST',
             headers: {
-                "Accept": "application/json",
-                "Content-type": "application/json; charset=UTF-8"
+                'Accept': 'application/json', 
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({order})
+            body: JSON.stringify({contact, products})
         })
         .then(res => res.json())
-        /*
+        
         if (res.ok === true) {
             return res.json
         }else{
             throw new Error('Impossible de contexter le server')
         }
-        */
+        
     }
-    fetchProducts().then(users => console.log(users))
-
+    await fetchProducts().then(users => console.log(users))
+*/
     /*
     ('https://jsonplaceholder.typicode.com/users')
         .then(r => r.json())
         .then(body => console.log(body))
         */
+
+        function makeJsonData() {
+            let contact = {
+              firstName: prenom.value,
+              lastName: nom.value,
+              address: adresse.value,
+              city: ville.value,
+              email: mail.value,
+            };
+            let items = getCart();
+            let products = [];
+          
+            for (i = 0; i < items.length; i++) {
+              if (products.find((e) => e == items[i][0])) {
+                console.log("not found");
+              } else {
+                products.push(items[i][0]);
+              }
+            }
+            let jsonData = JSON.stringify({ contact, products });
+            return jsonData;
+          }
 }
 
 main()
