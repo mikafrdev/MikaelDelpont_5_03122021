@@ -368,7 +368,8 @@ const main = async () => {
             })
             .then((data) => {
                 console.log('Success:', data)
-                return data
+                document.location.href="confirmation.html?orderId="+data.orderId
+                //return data
             })
             .catch((error) => {
                 console.error('Error:', error)
