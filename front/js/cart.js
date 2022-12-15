@@ -6,7 +6,7 @@ displayProducts = (productsLocalStorage, option) => {
 
     console.log("displayProducts")
 
-    if (option == "refresh") {        
+    if (option == "refresh") {
 
         //Supprime tous les enfant d'un élément
         var element = document.getElementById("cart__items")
@@ -18,7 +18,7 @@ displayProducts = (productsLocalStorage, option) => {
 
     let htmlContent
 
-    productsLocalStorage.forEach(function(product){
+    productsLocalStorage.forEach(function (product) {
 
         htmlContent = `
             <article class="cart__item" data-id="${product.id}">
@@ -30,7 +30,7 @@ displayProducts = (productsLocalStorage, option) => {
 
                 <div class="cart__content">
         `
-        product.details.forEach(function(details){
+        product.details.forEach(function (details) {
 
             htmlContent += `
                     <div class="cart__item__content">
@@ -77,24 +77,24 @@ const getAllProductsDataLocalStorage = (products) => {
     let order = new Array
     let productsDatasOrder = new Array
 
-    for (let i=0; i<localStorage.length; i++) {
-        
+    for (let i = 0; i < localStorage.length; i++) {
+
         let idLocalStorage = localStorage.key(i)
         let valueLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
 
         //On récupère toutes les informations des produits présents dans le local storage en faisant matcher leur ID avec celui de la BDD
-        let productsDataOrder = products.find(function(val, index) {
+        let productsDataOrder = products.find(function (val, index) {
             if (val._id == idLocalStorage) return val
         })
 
         order = {
-            id : idLocalStorage,
-            altTxt : productsDataOrder.altTxt,
-            description : productsDataOrder.description,
-            imageUrl : productsDataOrder.imageUrl,
-            name : productsDataOrder.name,
-            price : productsDataOrder.price,
-            details : valueLocalStorage
+            id: idLocalStorage,
+            altTxt: productsDataOrder.altTxt,
+            description: productsDataOrder.description,
+            imageUrl: productsDataOrder.imageUrl,
+            name: productsDataOrder.name,
+            price: productsDataOrder.price,
+            details: valueLocalStorage
         }
 
         productsDatasOrder.push(order)
@@ -114,16 +114,16 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
             const productId = element.closest(".cart__item").getAttribute("data-id")
             let ProductValueLocalStorage = new Array
             ProductValueLocalStorage = getProductValueLocalStorage(productId)
-            
+
             console.log("ProductValueLocalStorage", ProductValueLocalStorage)
 
-            let index = ProductValueLocalStorage.findIndex(function(todo, index) {
+            let index = ProductValueLocalStorage.findIndex(function (todo, index) {
                 return todo.color == productColor
             })
 
             newProductDetail = {
-                color : productColor,
-                quantity : element.value
+                color: productColor,
+                quantity: element.value
             }
 
             ProductValueLocalStorage.splice(index, 1, newProductDetail)
@@ -132,7 +132,7 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
 
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
 
-            
+
             displayProducts(productsLocalStorage, "init")
 
         })
@@ -146,7 +146,7 @@ updatePrices = (productsLocalStorage, element) => {
     const productId = element.closest(".cart__item").getAttribute("data-id")
     const productPrice = getProductPrice(productId, productsLocalStorage)
     const newPrice = element.getAttribute("data-price") * element.value
-    
+
     console.log("updatePrices")
     console.log("productsLocalStorage : ", productsLocalStorage)
     //console.log("element : ",element.getAttribute("data-price"))
@@ -174,7 +174,7 @@ _deleteOrder = () => {
     console.log("deleteOrder")
     let deleteLinks = document.getElementsByClassName("deleteItem")
 
-    for (let i=0; i < deleteLinks.length; i++) {
+    for (let i = 0; i < deleteLinks.length; i++) {
 
         deleteLinks[i].onclick = function () {
             deleteLinks = document.getElementsByClassName("deleteItem")
@@ -184,21 +184,21 @@ _deleteOrder = () => {
             let valueLocalStorage = JSON.parse(getValueFromLocalStorage)
             let indexRowColor
             let getParentCardNode
-            
-            indexRowColor = valueLocalStorage.findIndex(row =>row.color == colorProductSelected)
-            
+
+            indexRowColor = valueLocalStorage.findIndex(row => row.color == colorProductSelected)
+
             //Si l'utilisateur supprime le produit avec 1 seule couleur
             if (valueLocalStorage.length == 1) {
                 this.closest(".cart__item").remove()
                 localStorage.removeItem(idProductSelected)
-            
-            //Si l'utilisateur supprime le produit avec plusieurs couleurs
-            }else{
+
+                //Si l'utilisateur supprime le produit avec plusieurs couleurs
+            } else {
                 valueLocalStorage.splice(indexRowColor, 1)
                 getParentCardNode = this.closest(".cart__item__content")
                 getParentCardNode.remove()
                 localStorage.removeItem(idProductSelected)
-                
+
                 //Order.setOrder(idProductSelected, valueLocalStorage) - A FAIRE
                 let OrderValueStringified = JSON.stringify(valueLocalStorage)
                 localStorage.setItem(idProductSelected, OrderValueStringified)
@@ -207,24 +207,24 @@ _deleteOrder = () => {
     }
 }
 
-deleteOrder = () => {       
+deleteOrder = () => {
     let deleteElement = document.getElementsByClassName("deleteItem")
 
     for (const element of deleteElement) {
 
         element.addEventListener('click', () => {
             console.log("deleteOrder")
-            
+
             let productContainer = element.closest(".cart__item")
 
             if (productContainer.hasChildNodes()) {
                 let children = productContainer.childNodes
-              
+
                 for (const node of children) {
-                  console.log("node", node)
-                  //element.removeChild(element.firstChild)
+                    console.log("node", node)
+                    //element.removeChild(element.firstChild)
                 }
-              }
+            }
 
             //console.log("rowToDelete", rowToDelete)
         })
@@ -242,7 +242,7 @@ updatePrices = () => {
     console.log("updatePrices")
     const productsPrices = document.getElementsByClassName("pricequantity")
     const totalPrice = document.getElementById("totalPrice")
-    
+
     let productPriceCleaned = 0
 
     for (const productNode of productsPrices) {
@@ -256,7 +256,7 @@ updateQuantities = () => {
     console.log("updateQuantities")
     const totalQuantity = document.getElementById("totalQuantity")
     const productsQuantity = document.getElementsByClassName("itemQuantity")
-    
+
     let productQuantityCleaned = 0
 
     for (const productNode of productsQuantity) {
@@ -266,103 +266,22 @@ updateQuantities = () => {
     totalQuantity.innerHTML = productQuantityCleaned
 }
 
-_checkForm = (inputFirstName, inputLastName, inputAdress, inputCity, inputEmail) => {
-
-    console.log("checkForm")
-
-    let isValid = false
-
-    if (inputFirstName.name == "firstName") {
-        //'^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$'
-        let FirstNameRegExp = new RegExp('[a-zA-Z][^0-9]')
-        let testFirstName = FirstNameRegExp.test(inputFirstName.value)
-
-        if(testFirstName) {
-            element.nextElementSibling.innerHTML = ""
-            console.log("Prénom valide")
-            isValid = true
-        }else{
-            element.nextElementSibling.innerHTML = "Prénom invalide"
-            console.log("Prénom non valide")
-            isValid = false
-        }
-    }
-    if (inputLastName.name == "lastName") {
-        let lastNameRegExp = new RegExp('[a-zA-Z][^0-9]')
-        let testLastName = lastNameRegExp.test(inputLastName.value)
-
-        if(testLastName) {
-            element.nextElementSibling.innerHTML = ""
-            console.log("Nom valide")
-            isValid = true
-        }else{
-            element.nextElementSibling.innerHTML = "Nom invalide"
-            console.log("Nom non valide")
-            isValid = false
-        }
-    }
-    if (inputAdress.name == "address") {
-        let addressRegExp = new RegExp('[a-zA-Z0-9]')
-        let testAddress = addressRegExp.test(inputAdress.value)
-
-        if(testAddress) {
-            element.nextElementSibling.innerHTML = ""
-            console.log("Adresse valide")
-            isValid = true
-        }else{
-            element.nextElementSibling.innerHTML = "Adresse invalide"
-            console.log("Adresse non valide")
-            isValid = false
-        }
-    }
-    if (inputCity.name == "city") {
-        let cityRegExp = new RegExp('[a-zA-Z]')
-        let testcity = cityRegExp.test(inputCity.value)
-
-        if(testcity) {
-            element.nextElementSibling.innerHTML = ""
-            console.log("Ville valide")
-            isValid = true
-        }else{
-            element.nextElementSibling.innerHTML = "Ville invalide"
-            console.log("Ville non valide")
-            isValid = false
-        }
-    }
-    if (inputEmail.name == "email") {
-        //'^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$'
-        let emailRegExp = new RegExp('[a-zA-Z0-9]')
-        let testEmail = emailRegExp.test(inputEmail.value)
-
-        if(testEmail) {
-            element.nextElementSibling.innerHTML = ""
-            console.log("Adresse valide")
-            isValid = true
-        }else{
-            element.nextElementSibling.innerHTML = "Adresse invalide"
-            console.log("Adresse non valide")
-            isValid = false
-        }
-    }
-    return isValid
-}
-
 const main = async () => {
 
     //Enregistrement en dur pour les tests - A supprimer
     //localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
     //localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
     //localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
-    
+
     //Récupération des données de tous les produits présents dans la BDD
     const productsData = await getMockedData("")
-    
+
     //Récupération de toutes les informations des produits présents dans le local storage
     const productsLocalStorage = getAllProductsDataLocalStorage(productsData)
-    
+
     //Affichage des produits 
     displayProducts(productsLocalStorage, "init")
-    
+
     const elementsQuantity = document.getElementsByClassName("itemQuantity")
     changeProductQuantity(productsLocalStorage, elementsQuantity)
 
@@ -377,120 +296,87 @@ const main = async () => {
     const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
 
     formUser.addEventListener('submit', function (event) {
-        //Empêche le formulaire d'être exécuté
-        event.preventDefault()
+        event.preventDefault()  //Empêche le formulaire d'être exécuté
         isValid = checkForm(formInputs)
-        console.log("isValid form response : ", isValid)
+
+        if (isValid) {
+            fetchPostOrder()
+        }
+        console.log("isValid form response ?", isValid)
     })
 
     checkForm = (formInputs) => {
         let inputRegExp
-        let testInput    
+        let testInput
         let isValid = true
+
         for (const formInput of formInputs) {
-            if (formInput.name == "firstName" || formInput.name == "lastName") inputRegExp = new RegExp('[a-zA-Z][^0-9]')
-            if (formInput.name == "adress") inputRegExp = new RegExp('[a-zA-Z0-9]')
-            if (formInput.name == "city") inputRegExp = new RegExp('[a-zA-Z][^0-9]')
-            if (formInput.name == "email") inputRegExp = new RegExp('[a-zA-Z][^0-9]')
-                
-            testInput = inputRegExp.test(formInput.value)    
-            if(testInput) {
+            if (formInput.name == "firstName" || formInput.name == "lastName") {
+                inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            }
+            if (formInput.name == "adress") {
+                inputRegExp = new RegExp('[a-zA-Z0-9]')
+            }
+            if (formInput.name == "city") {
+                inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            }
+            if (formInput.name == "email") {
+                inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            }
+
+            testInput = inputRegExp.test(formInput.value)
+
+            if (testInput) {
                 formInput.nextElementSibling.innerHTML = ""
-                console.log(formInput.name+" valide")
-            }else{
-                formInput.nextElementSibling.innerHTML = formInput.name+" invalide"
-                console.log(formInput.name+" invalide")
+                console.log(formInput.name + " valide")
+            } else {
+                formInput.nextElementSibling.innerHTML = formInput.name + " invalide"
+                console.log(formInput.name + " invalide")
                 isValid = false
             }
-            /*
-            const r = fetch('https://jsonplaceholder.typicode.com/todos/1')
-            console.log(r)
-
-            fetch('https://jsonplaceholder.typicode.com/todos/1')
-                .then(response => response.json())
-                .then(json => console.log(json))
-            */
         }
         return isValid
     }
 
-    let contact = {
-        /*firstName : firstName,
-        lastName : lastName,
-        address : address,
-        city : city,
-        email : email,
-        products : []*/
-        firstName : "test",
-        lastName : "test",
-        address : "1 rue du test",
-        city : "Ville-test",
-        email : "unemail@testemail.com"
-    }
-
-    let products = ["034707184e8e4eefb46400b5a3774b5f"]
-
-    //console.log("products : ", contact, products)
-
-    let response = await fetch('http://localhost:3000/api/order/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(contact, products)
-      });
-      
-      let result = await response.json();
-      alert(result.message);
-
-    /*
-    async function fetchProducts() {
-        const res = await fetch('http://localhost:3000/api/order', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json', 
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({contact, products})
-        })
-        .then(res => res.json())
-        
-        if (res.ok === true) {
-            return res.json
-        }else{
-            throw new Error('Impossible de contexter le server')
+    fetchPostOrder = () => {
+        let contact = {
+            firstName: "test",
+            lastName: "test",
+            address: "1 rue du test",
+            city: "Ville-test",
+            email: "unemail@testemail.com"
         }
-        
-    }
-    await fetchProducts().then(users => console.log(users))
-*/
-    /*
-    ('https://jsonplaceholder.typicode.com/users')
-        .then(r => r.json())
-        .then(body => console.log(body))
-        */
 
-        function makeJsonData() {
-            let contact = {
-              firstName: prenom.value,
-              lastName: nom.value,
-              address: adresse.value,
-              city: ville.value,
-              email: mail.value,
-            };
-            let items = getCart();
-            let products = [];
-          
-            for (i = 0; i < items.length; i++) {
-              if (products.find((e) => e == items[i][0])) {
-                console.log("not found");
-              } else {
-                products.push(items[i][0]);
-              }
-            }
-            let jsonData = JSON.stringify({ contact, products });
-            return jsonData;
-          }
-}
+        let products = ["034707184e8e4eefb46400b5a3774b5f"]
+
+        let fetchPostUrl = "http://localhost:3000/api/products/order"
+        let fetchBody = { contact, products }
+
+        fetch(fetchPostUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            body: JSON.stringify(fetchBody)
+        })
+            .then((res) => {
+                if (res.ok) {
+                    return res.json()
+                } else {
+                    console.log("Problème server")
+                }
+            })
+            .then((data) => {
+                console.log('Success:', data)
+                return data
+            })
+            .catch((error) => {
+                console.error('Error:', error)
+
+            })
+    }
+    fetchPostOrder()
+
+} //END MAIN
 
 main()
