@@ -312,16 +312,19 @@ const main = async () => {
 
         for (const formInput of formInputs) {
             if (formInput.name == "firstName" || formInput.name == "lastName") {
-                inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+                inputRegExp = new RegExp('[a-zA-Z0-9à-üÀ-Ü-\'\s]')
             }
             if (formInput.name == "adress") {
-                inputRegExp = new RegExp('[a-zA-Z0-9]')
+                inputRegExp = new RegExp('([0-9a-zA-Z,\. ]*) ?([0-9]{5}) ?([a-zA-Z]*)')
             }
             if (formInput.name == "city") {
-                inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+                inputRegExp = new RegExp('[a-zA-Z0-9à-üÀ-Ü-\'\s]')
             }
-            if (formInput.name == "email") {
-                inputRegExp = new RegExp('[a-zA-Z][^0-9]')
+            if (formInput.email == "email") {
+                //(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))
+                //^.+@.+\..+
+                //^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$
+                inputRegExp = new RegExp('^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$')
             }
 
             testInput = inputRegExp.test(formInput.value)
@@ -376,7 +379,6 @@ const main = async () => {
 
             })
     }
-    fetchPostOrder()
 
 } //END MAIN
 
