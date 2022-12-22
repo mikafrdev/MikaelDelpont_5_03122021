@@ -15,19 +15,8 @@ getMockedData = async (productID) => {
             console.log("Problème server")
         }
     })
-    .then((data) => { 
-        //console.log('Success:', data)
-        //return data
-
-        //Récupération de toutes les informations des produits présents dans le local storage
-        const productsLocalStorage = getAllProductsDataLocalStorage(data)
-
-        console.log("productsLocalStorage : ", productsLocalStorage)
-
-        //Affichage des produits 
-        displayProducts(productsLocalStorage, "init")
-
-        return productsLocalStorage
+    .then((data) => {
+        return data
 
     })
     .catch((error) => { console.error('Error:', error) })
@@ -39,7 +28,7 @@ getMockedData = async (productID) => {
     Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
     calcul le prix des articles en fonction des quantités sélectionnées
 */
-displayProducts = (productsLocalStorage, option) => {
+displayProducts = (productsMerged, option) => {
 
     console.log("displayProducts")
 
@@ -57,7 +46,7 @@ displayProducts = (productsLocalStorage, option) => {
 
     let htmlContent
 
-    productsLocalStorage.forEach(function (product) {
+    productsMerged.forEach(function (product) {
 
         htmlContent = `
             <article class="cart__item" data-id="${product.id}">
@@ -112,7 +101,8 @@ const setProductValueLocalStorage = (productId, valueLocalStorage) => {
 
 
 //Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
-const getAllProductsDataLocalStorage = (products) => {
+const getProductsMerged = (productsMocked) => {
+    console.log("productsMocked : ", productsMocked)
     let order = new Array
     let productsDatasOrder = new Array
 
@@ -122,9 +112,11 @@ const getAllProductsDataLocalStorage = (products) => {
         let valueLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
 
         //On récupère toutes les informations des produits présents dans le local storage en faisant matcher leur ID avec celui de la BDD
-        let productsDataOrder = products.find(function (val, index) {
+        let productsDataOrder = productsMocked.find(function (val, index) {
             if (val._id == idLocalStorage) return val
         })
+
+        //console.log("getProductsMerged - productsDataOrder : ", productsDataOrder)
 
         order = {
             id: idLocalStorage,
@@ -138,24 +130,24 @@ const getAllProductsDataLocalStorage = (products) => {
 
         productsDatasOrder.push(order)
     }
+
+    console.log("getProductsMerged - productsDataOrder : ", productsDataOrder)
+
     return productsDatasOrder
 }
 
-changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
+changeProductQuantity = (productsMocked, elementsQuantity) => {
 
-    console.log("changeProductQuantity demandé !")
+    console.log("changeProductQuantity")
 
     for (const element of elementsQuantity) {
 
         element.addEventListener('click', function () {
 
-            /*
             let productColor = element.getAttribute("data-color")
             const productId = element.closest(".cart__item").getAttribute("data-id")
             let ProductValueLocalStorage = new Array
             ProductValueLocalStorage = getProductValueLocalStorage(productId)
-
-            console.log("ProductValueLocalStorage", ProductValueLocalStorage)
 
             let index = ProductValueLocalStorage.findIndex(function (todo, index) {
                 return todo.color == productColor
@@ -168,12 +160,15 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
 
             ProductValueLocalStorage.splice(index, 1, newProductDetail)
 
-            console.log("ProductValueLocalStorage", ProductValueLocalStorage)
+            //console.log("ProductValueLocalStorage", ProductValueLocalStorage)
 
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
-            */
+            
+            let productsMerged = getProductsMerged(productsMocked)
 
-            displayProducts(productsLocalStorage, "init")
+            console.log("changeProductQuantity - productsMerged", productsMerged)
+        
+            displayProducts(productsMerged, "init")
 
         })
     }
@@ -182,16 +177,16 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
 /*
     Met à jour les prix de la page
 */
-updatePrices = (productsLocalStorage, element) => {
+_updatePrices = (productsLocalStorage, element) => {
     const productId = element.closest(".cart__item").getAttribute("data-id")
     const productPrice = getProductPrice(productId, productsLocalStorage)
     const newPrice = element.getAttribute("data-price") * element.value
 
-    console.log("updatePrices")
-    console.log("productsLocalStorage : ", productsLocalStorage)
+    //console.log("updatePrices")
+    //console.log("productsLocalStorage : ", productsLocalStorage)
     //console.log("element : ",element.getAttribute("data-price"))
-    console.log("newPrice", newPrice)
-    console.log(element.closest(".cart__item").getAttribute("data-id"))
+    //console.log("newPrice", newPrice)
+    //console.log(element.closest(".cart__item").getAttribute("data-id"))
     //getProductData
     //element.closest(".pricequantity").textContent = newPrice+" €"
     //element.setAttribute("value", newPrice)
@@ -288,7 +283,7 @@ updatePrices = () => {
     for (const productNode of productsPrices) {
         productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
     }
-    console.log("TOTAL PRIX : ", productPriceCleaned)
+    //console.log("TOTAL PRIX : ", productPriceCleaned)
     totalPrice.innerHTML = productPriceCleaned
 }
 
@@ -302,7 +297,7 @@ updateQuantities = () => {
     for (const productNode of productsQuantity) {
         productQuantityCleaned = productQuantityCleaned + parseInt(productNode.value.substring(0, productNode.value.length))
     }
-    console.log("TOTAL QUANTITES : ", productQuantityCleaned)
+    //console.log("TOTAL QUANTITES : ", productQuantityCleaned)
     totalQuantity.innerHTML = productQuantityCleaned
 }
 
@@ -314,10 +309,16 @@ const main = async () => {
     //localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
 
     //Récupération des données de tous les produits présents dans la BDD
-    const productsLocalStorage = await getMockedData("")
+    const productsMocked = await getMockedData("")
+
+    //Récupération de toutes les informations des produits présents dans le local storage
+    const productsMerged = getProductsMerged(productsMocked)
+
+    //Affichage des produits 
+    displayProducts(productsMerged, "init")
 
     const elementsQuantity = document.getElementsByClassName("itemQuantity")
-    changeProductQuantity(productsLocalStorage, elementsQuantity)
+    changeProductQuantity(productsMocked, elementsQuantity)
 
     //order.setPricebyProduct()
     deleteOrder()
