@@ -1,4 +1,41 @@
 /*
+    Récupération des données mockées d'un produit
+    - Si aucun paramètre n'est passé alors on affiche tous les produits
+    - Si un ID est renseigné en paramètre alors on affiche uniquement les données d'un produit
+
+*/
+getMockedData = async (productID) => {
+
+    let canap = await fetch('http://localhost:3000/api/products/' + productID)
+    .then((response) => {
+        if (response.ok) {
+            //console.log("Réponse ok du server")
+            return response.json()
+        }else{
+            console.log("Problème server")
+        }
+    })
+    .then((data) => { 
+        //console.log('Success:', data)
+        //return data
+
+        //Récupération de toutes les informations des produits présents dans le local storage
+        const productsLocalStorage = getAllProductsDataLocalStorage(data)
+
+        console.log("productsLocalStorage : ", productsLocalStorage)
+
+        //Affichage des produits 
+        displayProducts(productsLocalStorage, "init")
+
+        return productsLocalStorage
+
+    })
+    .catch((error) => { console.error('Error:', error) })
+
+    return canap
+}
+
+/*
     Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
     calcul le prix des articles en fonction des quantités sélectionnées
 */
@@ -6,6 +43,7 @@ displayProducts = (productsLocalStorage, option) => {
 
     console.log("displayProducts")
 
+    /*
     if (option == "refresh") {
 
         //Supprime tous les enfant d'un élément
@@ -15,6 +53,7 @@ displayProducts = (productsLocalStorage, option) => {
             element.removeChild(element.firstChild)
         }
     }
+    */
 
     let htmlContent
 
@@ -108,8 +147,9 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
 
     for (const element of elementsQuantity) {
 
-        element.addEventListener('click', () => {
+        element.addEventListener('click', function () {
 
+            /*
             let productColor = element.getAttribute("data-color")
             const productId = element.closest(".cart__item").getAttribute("data-id")
             let ProductValueLocalStorage = new Array
@@ -131,7 +171,7 @@ changeProductQuantity = (productsLocalStorage, elementsQuantity) => {
             console.log("ProductValueLocalStorage", ProductValueLocalStorage)
 
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
-
+            */
 
             displayProducts(productsLocalStorage, "init")
 
@@ -221,7 +261,7 @@ deleteOrder = () => {
                 let children = productContainer.childNodes
 
                 for (const node of children) {
-                    console.log("node", node)
+                    //console.log("node", node)
                     //element.removeChild(element.firstChild)
                 }
             }
@@ -274,13 +314,7 @@ const main = async () => {
     //localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
 
     //Récupération des données de tous les produits présents dans la BDD
-    const productsData = await getMockedData("")
-
-    //Récupération de toutes les informations des produits présents dans le local storage
-    const productsLocalStorage = getAllProductsDataLocalStorage(productsData)
-
-    //Affichage des produits 
-    displayProducts(productsLocalStorage, "init")
+    const productsLocalStorage = await getMockedData("")
 
     const elementsQuantity = document.getElementsByClassName("itemQuantity")
     changeProductQuantity(productsLocalStorage, elementsQuantity)
@@ -318,7 +352,8 @@ const main = async () => {
                 inputRegExp = new RegExp('([0-9a-zA-Z,\. ]*) ?([0-9]{5}) ?([a-zA-Z]*)')
             }
             if (formInput.name == "city") {
-                inputRegExp = new RegExp('[a-zA-Z0-9à-üÀ-Ü-\'\s]')
+                //[a-zA-Z0-9à-üÀ-Ü-\'\s]
+                inputRegExp = new RegExp('/^[a-zA-Z.\'-]+(?:[\s-][\/a-zA-Z.]+)*$/gm')
             }
             if (formInput.email == "email") {
                 //(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))
@@ -355,6 +390,8 @@ const main = async () => {
         let fetchPostUrl = "http://localhost:3000/api/products/order"
         let fetchBody = { contact, products }
 
+        console.log(JSON.stringify(fetchBody))
+
         fetch(fetchPostUrl, {
             method: "POST",
             headers: {
@@ -371,14 +408,15 @@ const main = async () => {
             })
             .then((data) => {
                 console.log('Success:', data)
-                document.location.href="confirmation.html?orderId="+data.orderId
-                //return data
+                //document.location.href="confirmation.html?orderId="+data.orderId
+                return data
             })
             .catch((error) => {
                 console.error('Error:', error)
 
             })
     }
+    //fetchPostOrder()
 
 } //END MAIN
 
