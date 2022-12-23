@@ -32,7 +32,7 @@ displayProducts = (productsMerged, option) => {
 
     console.log("displayProducts")
 
-    /*
+    
     if (option == "refresh") {
 
         //Supprime tous les enfant d'un élément
@@ -42,12 +42,94 @@ displayProducts = (productsMerged, option) => {
             element.removeChild(element.firstChild)
         }
     }
-    */
+
+    console.log(productsMerged)    
 
     let htmlContent
 
     productsMerged.forEach(function (product) {
 
+        console.log(product)
+
+        const node_parent = document.getElementById('cart__items')
+        const node_article = document.createElement("article")
+        node_article.setAttribute("class", "cart__item")
+        node_article.setAttribute("data-id", product.id)
+        node_parent.appendChild(node_article)
+
+        let node_div = document.createElement("div")
+        node_div.setAttribute("class", "cart__item__img")
+        node_article.appendChild(node_div)
+
+        let node_h2 = document.createElement("h2")
+        node_h2.innerHTML = product.name
+        node_div.appendChild(node_h2)
+
+        node_img = document.createElement("img")
+        node_img.setAttribute("src", product.imageUrl)
+        node_img.setAttribute("alt", product.altTxt)
+        node_div.appendChild(node_img)
+
+        node_container_details = document.createElement("div")
+        node_container_details.setAttribute("class", "cart__content")
+        node_article.appendChild(node_container_details)
+
+        product.details.forEach(function (details) {
+
+            node_div = document.createElement("div")
+            node_div.setAttribute("class", "cart__item__content")
+            node_container_details.appendChild(node_div)
+
+            const node_div_2 = document.createElement("div")
+            node_div_2.setAttribute("class", "cart__item__content__description")
+            node_div.appendChild(node_div_2)
+
+            let node_p = document.createElement("p")
+            node_p.innerHTML = details.color
+            node_div_2.appendChild(node_p)
+
+            node_p = document.createElement("p")
+            node_p.setAttribute("class", "pricequantity")
+            node_p.innerHTML = product.price * details.quantity
+            node_div_2.appendChild(node_p)
+
+            node_div_3 = document.createElement("div")
+            node_div_3.setAttribute("class", "cart__item__content__settings")
+            node_div_2.appendChild(node_div_3)
+
+            let node_div_4 = document.createElement("div")
+            node_div_4.setAttribute("class", "cart__item__content__settings__quantity")
+            node_div_3.appendChild(node_div_4)
+
+            node_p = document.createElement("p")
+            node_p.innerHTML = "Qté : ", details.quantity
+            node_div_3.appendChild(node_p)
+
+            const node_input = document.createElement("input")
+            node_input.setAttribute("data-price", product.price)
+            node_input.setAttribute("data-color", details.color)
+            node_input.setAttribute("type", "number")
+            node_input.setAttribute("class", "itemQuantity")
+            node_input.setAttribute("name", "itemQuantity")
+            node_input.setAttribute("min", "1")
+            node_input.setAttribute("max", "100")
+            node_input.setAttribute("value", details.quantity)
+            node_div_3.appendChild(node_input)
+
+            node_div_4 = document.createElement("div")
+            node_div_4.setAttribute("class", "cart__item__content__settings__delete")
+            node_div_3.appendChild(node_div_4)
+
+            node_div_4 = document.createElement("p")
+            node_div_4.setAttribute("class", "deleteItem")
+            node_div_4.setAttribute("data-id", product.id)
+            node_div_4.setAttribute("data-color", details.color)
+            node_p.innerHTML = "Supprimer"
+            node_div_3.appendChild(node_div_4)
+
+        })
+
+        /*
         htmlContent = `
             <article class="cart__item" data-id="${product.id}">
 
@@ -84,6 +166,7 @@ displayProducts = (productsMerged, option) => {
             </article>
             `
         document.querySelector('#cart__items').insertAdjacentHTML('afterbegin', htmlContent)
+        */
     })
 }
 
@@ -96,13 +179,14 @@ const getProductValueLocalStorage = (productId) => {
 const setProductValueLocalStorage = (productId, valueLocalStorage) => {
     console.log("setProductValueLocalStorage")
     let valueLocalStorageStringified = JSON.stringify(valueLocalStorage)
+    console.log("productId valueLocalStorageStringified : ", productId, valueLocalStorageStringified)
     localStorage.setItem(productId, valueLocalStorageStringified)
 }
 
 
 //Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
 const getProductsMerged = (productsMocked) => {
-    console.log("productsMocked : ", productsMocked)
+    //console.log("productsMocked : ", productsMocked)
     let order = new Array
     let productsDatasOrder = new Array
 
@@ -111,12 +195,17 @@ const getProductsMerged = (productsMocked) => {
         let idLocalStorage = localStorage.key(i)
         let valueLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
 
+        //console.log("valueLocalStorage : ", valueLocalStorage)
+
+        //console.log("BOUCLE TEST : ", productsMocked, JSON.parse(localStorage.getItem(idLocalStorage)))
+
         //On récupère toutes les informations des produits présents dans le local storage en faisant matcher leur ID avec celui de la BDD
         let productsDataOrder = productsMocked.find(function (val, index) {
+            //console.log("val._id, idLocalStorage : ", val._id, idLocalStorage)
             if (val._id == idLocalStorage) return val
         })
 
-        //console.log("getProductsMerged - productsDataOrder : ", productsDataOrder)
+        //console.log("productsDataOrder : ", productsDataOrder)
 
         order = {
             id: idLocalStorage,
@@ -131,7 +220,7 @@ const getProductsMerged = (productsMocked) => {
         productsDatasOrder.push(order)
     }
 
-    console.log("getProductsMerged - productsDataOrder : ", productsDataOrder)
+    console.log("productsDataOrder : ", productsDatasOrder)
 
     return productsDatasOrder
 }
@@ -143,6 +232,8 @@ changeProductQuantity = (productsMocked, elementsQuantity) => {
     for (const element of elementsQuantity) {
 
         element.addEventListener('click', function () {
+
+            console.log("TEST !")
 
             let productColor = element.getAttribute("data-color")
             const productId = element.closest(".cart__item").getAttribute("data-id")
@@ -157,6 +248,7 @@ changeProductQuantity = (productsMocked, elementsQuantity) => {
                 color: productColor,
                 quantity: element.value
             }
+            //console.log("newProductDetail", newProductDetail)
 
             ProductValueLocalStorage.splice(index, 1, newProductDetail)
 
@@ -166,9 +258,9 @@ changeProductQuantity = (productsMocked, elementsQuantity) => {
             
             let productsMerged = getProductsMerged(productsMocked)
 
-            console.log("changeProductQuantity - productsMerged", productsMerged)
+            //console.log("changeProductQuantity - productsMerged", productsMerged)
         
-            displayProducts(productsMerged, "init")
+            displayProducts(productsMerged, "refresh")
 
         })
     }
@@ -304,9 +396,9 @@ updateQuantities = () => {
 const main = async () => {
 
     //Enregistrement en dur pour les tests - A supprimer
-    //localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
-    //localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
-    //localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
+    localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
+    localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
+    localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
 
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData("")
@@ -324,7 +416,7 @@ const main = async () => {
     deleteOrder()
 
     updatePrices()
-    updateQuantities()
+    //updateQuantities()
 
     /*************** Ecouter le clic sur le submit du formulaire ***************/
 
