@@ -26,7 +26,6 @@ getMockedData = async (productID) => {
     calcul le prix des articles en fonction des quantités sélectionnées
 */
 displayProducts = (productsMocked, productsMerged, option) => {
-    console.log("displayProducts")
     if (option == "refresh") {
         //Supprime tous les enfant d'un élément
         var e = document.getElementById("cart__items")
@@ -106,13 +105,6 @@ displayProducts = (productsMocked, productsMerged, option) => {
             node_input.setAttribute("value", details.quantity)
             node_div_4.appendChild(node_input)
 
-            //node_input.addEventListener("click", testDavid(productsMocked, node_input))
-            //console.log(node_input.className)
-            //node_input.addEventListener("click", console.log("test click"))
-
-            //let productsMerged = getProductsMerged(productsMocked)
-            //node_input.addEventListener("click", displayProducts(productsMerged, "refresh"))
-
             node_div_4 = document.createElement("div")
             node_div_4.setAttribute("class", "cart__item__content__settings__delete")
             node_div_3.appendChild(node_div_4)
@@ -129,6 +121,7 @@ displayProducts = (productsMocked, productsMerged, option) => {
     changeProductQuantity(productsMocked)
     updatePrices()
     updateQuantities()
+    deleteOrder()
 }
 
 changeProductQuantity = (productsMocked) => {
@@ -164,12 +157,12 @@ const getProductValueLocalStorage = (productId) => {
     return valueLocalStorage
 }
 
-const setProductValueLocalStorage = (productId, valueLocalStorage) => {
-    console.log("setProductValueLocalStorage")
+let setProductValueLocalStorage = (productId, valueLocalStorage) => {
+    console.log(productId)
+    console.log(valueLocalStorage)
     let valueLocalStorageStringified = JSON.stringify(valueLocalStorage)
     localStorage.setItem(productId, valueLocalStorageStringified)
 }
-
 
 //Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
 const getProductsMerged = (productsMocked) => {
@@ -207,62 +200,30 @@ const getProductsMerged = (productsMocked) => {
     - Si plusieurs couleurs sont renseignées, on ne supprime que la ligne concernée
     - Les informations du localStorage sont mise à jour
 */
-_deleteOrder = () => {
-    let deleteLinks = document.getElementsByClassName("deleteItem")
-
-    for (let i = 0; i < deleteLinks.length; i++) {
-        deleteLinks[i].onclick = function () {
-            deleteLinks = document.getElementsByClassName("deleteItem")
-            let idProductSelected = this.getAttribute("data-id")
-            let colorProductSelected = this.getAttribute("data-color")
-            let getValueFromLocalStorage = localStorage.getItem(idProductSelected)
-            let valueLocalStorage = JSON.parse(getValueFromLocalStorage)
-            let indexRowColor
-            let getParentCardNode
-            indexRowColor = valueLocalStorage.findIndex(row => row.color == colorProductSelected)
-
-            //Si l'utilisateur supprime le produit avec 1 seule couleur
-            if (valueLocalStorage.length == 1) {
-                this.closest(".cart__item").remove()
-                localStorage.removeItem(idProductSelected)
-
-                //Si l'utilisateur supprime le produit avec plusieurs couleurs
-            } else {
-                valueLocalStorage.splice(indexRowColor, 1)
-                getParentCardNode = this.closest(".cart__item__content")
-                getParentCardNode.remove()
-                localStorage.removeItem(idProductSelected)
-
-                //Order.setOrder(idProductSelected, valueLocalStorage) - A FAIRE
-                let OrderValueStringified = JSON.stringify(valueLocalStorage)
-                localStorage.setItem(idProductSelected, OrderValueStringified)
-            }
-        }
-    }
-}
-
 deleteOrder = () => {
     let deleteElement = document.getElementsByClassName("deleteItem")
 
     for (const element of deleteElement) {
         element.addEventListener('click', () => {
-            let productID = element.closest(".cart__item__content").getAttribute("data-id")
-            let productColor = element.closest(".cart__item__content").getAttribute("data-color")
-            console.log("productID : ", productID)
-            console.log("data-color : ", productColor)
+            //console.log(element)
+            let productId = element.getAttribute("data-id")
+            let productColor = element.getAttribute("data-color")
+            let valueLocalStorage = getProductValueLocalStorage(productId)
+            let indexRowColor = valueLocalStorage.findIndex(row => row.color == productColor)   //Retourne l'index de la couleur correspondante dans le localstorage
+
+            //Si l'utilisateur supprime le produit avec 1 seule couleur
+            if (valueLocalStorage.length == 1) {
+                localStorage.removeItem(idProductSelected)
+            } else {    //Si l'utilisateur supprime le produit avec plusieurs couleurs
+                valueLocalStorage.splice(indexRowColor, 1)  //Retourne un tableau correspondant à la couleur + quantité depuis le local storage
+                console.log(valueLocalStorage)
+                setProductValueLocalStorage(productId, valueLocalStorage)
+            }
         })
     }
-    /*
-    //Supprime tous les enfant d'un élément
-    var element = document.getElementById("cart__items")
-    while (element.firstChild) {
-        element.removeChild(element.firstChild)
-    }
-    */
 }
 
 updatePrices = () => {
-    console.log("updatePrices")
     const productsPrices = document.getElementsByClassName("pricequantity")
     const totalPrice = document.getElementById("totalPrice")
     let productPriceCleaned = 0
@@ -286,11 +247,11 @@ updateQuantities = () => {
 
 const main = async () => {
     //Enregistrement en dur pour les tests - A supprimer
-    /*
+    
     localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
     localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
     localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
-    */
+    
 
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData("")
@@ -298,7 +259,6 @@ const main = async () => {
     //Récupération de toutes les informations des produits présents dans le local storage
     const productsMerged = getProductsMerged(productsMocked)
     displayProducts(productsMocked, productsMerged, "init") //Affichage des produits 
-    deleteOrder()
 
     /*************** Ecouter le clic sur le submit du formulaire ***************/
     const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
