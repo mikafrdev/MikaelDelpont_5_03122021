@@ -26,8 +26,9 @@ getMockedData = async (productID) => {
     calcul le prix des articles en fonction des quantités sélectionnées
 */
 displayProducts = (productsMocked, productsMerged, option) => {
+    
+    //Supprime tous les articles de l'affichage uniquement
     if (option == "refresh") {
-        //Supprime tous les enfant d'un élément
         var e = document.getElementById("cart__items")
         var child = e.lastElementChild
         
@@ -37,91 +38,98 @@ displayProducts = (productsMocked, productsMerged, option) => {
         }
     }
 
-    productsMerged.forEach(function (product) {
-        const node_parent = document.getElementById('cart__items')
-        const node_article = document.createElement("article")
-        node_article.setAttribute("class", "cart__item")
-        node_article.setAttribute("data-id", product.id)
-        node_parent.appendChild(node_article)
+    const node_parent = document.getElementById('cart__items')
 
-        let node_div = document.createElement("div")
-        node_div.setAttribute("class", "cart__item__img")
-        node_article.appendChild(node_div)
+    if (productsMerged.length) {
+        productsMerged.forEach(function (product) {
+            const node_article = document.createElement("article")
+            node_article.setAttribute("class", "cart__item")
+            node_article.setAttribute("data-id", product.id)
+            node_parent.appendChild(node_article)
 
-        let node_h2 = document.createElement("h2")
-        node_h2.innerHTML = product.name
-        node_div.appendChild(node_h2)
+            let node_div = document.createElement("div")
+            node_div.setAttribute("class", "cart__item__img")
+            node_article.appendChild(node_div)
 
-        node_img = document.createElement("img")
-        node_img.setAttribute("src", product.imageUrl)
-        node_img.setAttribute("alt", product.altTxt)
-        node_div.appendChild(node_img)
+            let node_h2 = document.createElement("h2")
+            node_h2.innerHTML = product.name
+            node_div.appendChild(node_h2)
 
-        node_container_details = document.createElement("div")
-        node_container_details.setAttribute("class", "cart__content")
-        node_article.appendChild(node_container_details)
+            node_img = document.createElement("img")
+            node_img.setAttribute("src", product.imageUrl)
+            node_img.setAttribute("alt", product.altTxt)
+            node_div.appendChild(node_img)
 
-        product.details.forEach(function (details) {
+            node_container_details = document.createElement("div")
+            node_container_details.setAttribute("class", "cart__content")
+            node_article.appendChild(node_container_details)
 
-            node_div = document.createElement("div")
-            node_div.setAttribute("class", "cart__item__content")
-            node_div.setAttribute("data-id", product.id)
-            node_div.setAttribute("data-color", details.color)
-            node_container_details.appendChild(node_div)
+            product.details.forEach(function (details) {
+                node_div = document.createElement("div")
+                node_div.setAttribute("class", "cart__item__content")
+                node_div.setAttribute("data-id", product.id)
+                node_div.setAttribute("data-color", details.color)
+                node_container_details.appendChild(node_div)
 
-            const node_div_2 = document.createElement("div")
-            node_div_2.setAttribute("class", "cart__item__content__description")
-            node_div.appendChild(node_div_2)
+                const node_div_2 = document.createElement("div")
+                node_div_2.setAttribute("class", "cart__item__content__description")
+                node_div.appendChild(node_div_2)
 
-            let node_p = document.createElement("p")
-            node_p.innerHTML = details.color
-            node_div_2.appendChild(node_p)
+                let node_p = document.createElement("p")
+                node_p.innerHTML = details.color
+                node_div_2.appendChild(node_p)
 
-            node_p = document.createElement("p")
-            node_p.setAttribute("class", "pricequantity")
-            node_p.innerHTML = product.price * details.quantity + " €"
-            node_div_2.appendChild(node_p)
+                node_p = document.createElement("p")
+                node_p.setAttribute("class", "pricequantity")
+                node_p.innerHTML = product.price * details.quantity + " €"
+                node_div_2.appendChild(node_p)
 
-            node_div_3 = document.createElement("div")
-            node_div_3.setAttribute("class", "cart__item__content__settings")
-            node_div_2.appendChild(node_div_3)
+                node_div_3 = document.createElement("div")
+                node_div_3.setAttribute("class", "cart__item__content__settings")
+                node_div_2.appendChild(node_div_3)
 
-            let node_div_4 = document.createElement("div")
-            node_div_4.setAttribute("class", "cart__item__content__settings__quantity")
-            node_div_3.appendChild(node_div_4)
+                let node_div_4 = document.createElement("div")
+                node_div_4.setAttribute("class", "cart__item__content__settings__quantity")
+                node_div_3.appendChild(node_div_4)
 
-            let node_p_quantite = document.createElement("p")
-            node_p_quantite.innerHTML = "Qté : " + details.quantity
-            node_div_4.appendChild(node_p_quantite)
+                let node_p_quantite = document.createElement("p")
+                node_p_quantite.innerHTML = "Qté : " + details.quantity
+                node_div_4.appendChild(node_p_quantite)
 
-            const node_input = document.createElement("input")
-            node_input.setAttribute("data-price", product.price)
-            node_input.setAttribute("data-color", details.color)
-            node_input.setAttribute("type", "number")
-            node_input.setAttribute("class", "itemQuantity")
-            node_input.setAttribute("name", "itemQuantity")
-            node_input.setAttribute("min", "1")
-            node_input.setAttribute("max", "100")
-            node_input.setAttribute("value", details.quantity)
-            node_div_4.appendChild(node_input)
+                const node_input = document.createElement("input")
+                node_input.setAttribute("data-price", product.price)
+                node_input.setAttribute("data-color", details.color)
+                node_input.setAttribute("type", "number")
+                node_input.setAttribute("class", "itemQuantity")
+                node_input.setAttribute("name", "itemQuantity")
+                node_input.setAttribute("min", "1")
+                node_input.setAttribute("max", "100")
+                node_input.setAttribute("value", details.quantity)
+                node_div_4.appendChild(node_input)
 
-            node_div_4 = document.createElement("div")
-            node_div_4.setAttribute("class", "cart__item__content__settings__delete")
-            node_div_3.appendChild(node_div_4)
+                node_div_4 = document.createElement("div")
+                node_div_4.setAttribute("class", "cart__item__content__settings__delete")
+                node_div_3.appendChild(node_div_4)
 
-            node_p_supprimer = document.createElement("p")
-            node_p_supprimer.setAttribute("class", "deleteItem")
-            node_p_supprimer.setAttribute("data-id", product.id)
-            node_p_supprimer.setAttribute("data-color", details.color)
-            node_p_supprimer.innerHTML = "Supprimer"
-            node_div_4.appendChild(node_p_supprimer)
+                node_p_supprimer = document.createElement("p")
+                node_p_supprimer.setAttribute("class", "deleteItem")
+                node_p_supprimer.setAttribute("data-id", product.id)
+                node_p_supprimer.setAttribute("data-color", details.color)
+                node_p_supprimer.innerHTML = "Supprimer"
+                node_div_4.appendChild(node_p_supprimer)
+            })
         })
-    })
+    }else{
+        node_message = document.createElement("div")
+        node_message.setAttribute("class", "cart__item")
+        node_message.innerHTML = "Votre panier est vide, merci d'ajouter des articles pour pouvoir passer une commande."
+        node_parent.appendChild(node_message)
+    }
 
     changeProductQuantity(productsMocked)
     updatePrices()
     updateQuantities()
-    deleteOrder()
+    deleteOrder(productsMocked)
 }
 
 changeProductQuantity = (productsMocked) => {
@@ -200,7 +208,7 @@ const getProductsMerged = (productsMocked) => {
     - Si plusieurs couleurs sont renseignées, on ne supprime que la ligne concernée
     - Les informations du localStorage sont mise à jour
 */
-deleteOrder = () => {
+deleteOrder = (productsMocked) => {
     let deleteElement = document.getElementsByClassName("deleteItem")
 
     for (const element of deleteElement) {
@@ -213,12 +221,14 @@ deleteOrder = () => {
 
             //Si l'utilisateur supprime le produit avec 1 seule couleur
             if (valueLocalStorage.length == 1) {
-                localStorage.removeItem(idProductSelected)
+                localStorage.removeItem(productId)
             } else {    //Si l'utilisateur supprime le produit avec plusieurs couleurs
                 valueLocalStorage.splice(indexRowColor, 1)  //Retourne un tableau correspondant à la couleur + quantité depuis le local storage
-                console.log(valueLocalStorage)
+                //console.log(valueLocalStorage)
                 setProductValueLocalStorage(productId, valueLocalStorage)
             }
+            let productsMerged = getProductsMerged(productsMocked)
+            displayProducts(productsMocked, productsMerged, "refresh")
         })
     }
 }
@@ -247,18 +257,18 @@ updateQuantities = () => {
 
 const main = async () => {
     //Enregistrement en dur pour les tests - A supprimer
-    
+    /*
     localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
     localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
     localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
-    
+    */
 
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData("")
 
     //Récupération de toutes les informations des produits présents dans le local storage
     const productsMerged = getProductsMerged(productsMocked)
-    displayProducts(productsMocked, productsMerged, "init") //Affichage des produits 
+    displayProducts(productsMocked, productsMerged) //Affichage des produits 
 
     /*************** Ecouter le clic sur le submit du formulaire ***************/
     const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
