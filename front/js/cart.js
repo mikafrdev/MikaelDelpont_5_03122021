@@ -257,11 +257,11 @@ updateQuantities = () => {
 
 const main = async () => {
     //Enregistrement en dur pour les tests - A supprimer
-    /*
+    
     localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
     localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
     localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
-    */
+    
 
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData("")
@@ -274,47 +274,39 @@ const main = async () => {
     const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
     formUser.addEventListener('submit', function (event) {
         event.preventDefault()  //Empêche le formulaire d'être exécuté
-        isValid = checkForm(formInputs)
+        isValid = checkForm()
 
         if (isValid) {
             fetchPostOrder()
         }
     })
 
-    checkForm = (formInputs) => {
-        let inputRegExp
-        let testInput
+    checkForm = () => {
         let isValid = true
+        let RegExpArray = {
+            firstName : '[a-zA-Z0-9à-üÀ-Ü-\'\s]',
+            lastName : '[a-zA-Z0-9à-üÀ-Ü-\'\s]',
+            address : '^[a-zA-Z0-9à-üÀ-Ü .,#;:\'-]{1,60}$',
+            city : '^[a-zA-Zà-üÀ-Ü]+(?:[\s-][\/a-zA-Z.]+)*$',
+            email : '^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$'
+        }
 
-        for (const formInput of formInputs) {
-            if (formInput.name == "firstName" || formInput.name == "lastName") {
-                inputRegExp = new RegExp('[a-zA-Z0-9à-üÀ-Ü-\'\s]')
-            }
-            if (formInput.name == "adress") {
-                inputRegExp = new RegExp('([0-9a-zA-Z,\. ]*) ?([0-9]{5}) ?([a-zA-Z]*)')
-            }
-            if (formInput.name == "city") {
-                //[a-zA-Z0-9à-üÀ-Ü-\'\s]
-                inputRegExp = new RegExp('/^[a-zA-Z.\'-]+(?:[\s-][\/a-zA-Z.]+)*$/gm')
-            }
-            if (formInput.email == "email") {
-                //(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))
-                //^.+@.+\..+
-                //^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$
-                inputRegExp = new RegExp('^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$')
-            }
-
-            testInput = inputRegExp.test(formInput.value)
+        for (const [key, value] of Object.entries(RegExpArray)) {
+            element = document.getElementById(`${key}`)
+            inputRegExp = new RegExp(`${value}`)
+            testInput = inputRegExp.test(element.value)
+            console.log("testInput" + `${key}` + "  : ", testInput)
 
             if (testInput) {
-                formInput.nextElementSibling.innerHTML = ""
-                console.log(formInput.name + " valide")
+                element.nextElementSibling.innerHTML = ""
+                console.log(element.name + " valide")
             } else {
-                formInput.nextElementSibling.innerHTML = formInput.name + " invalide"
-                console.log(formInput.name + " invalide")
+                element.nextElementSibling.innerHTML = element.name + " invalide"
+                console.log(element.name + " invalide")
                 isValid = false
             }
         }
+        
         return isValid
     }
 
