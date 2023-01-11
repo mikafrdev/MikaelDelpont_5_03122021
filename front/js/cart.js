@@ -1,27 +1,4 @@
 /*
-    Récupération des données mockées d'un produit
-    - Si aucun paramètre n'est passé alors on affiche tous les produits
-    - Si un ID est renseigné en paramètre alors on affiche uniquement les données d'un produit
-
-*/
-getMockedData = async (productID) => {
-    let canap = await fetch('http://localhost:3000/api/products/' + productID)
-    .then((response) => {
-        if (response.ok) {
-            return response.json()
-        }else{
-            console.log("Problème server")
-        }
-    })
-    .then((data) => {
-        return data
-
-    })
-    .catch((error) => { console.error('Error:', error) })
-    return canap
-}
-
-/*
     Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
     calcul le prix des articles en fonction des quantités sélectionnées
 */
@@ -264,7 +241,7 @@ const main = async () => {
     
 
     //Récupération des données de tous les produits présents dans la BDD
-    const productsMocked = await getMockedData("")
+    const productsMocked = await getMockedData()
 
     //Récupération de toutes les informations des produits présents dans le local storage
     const productsMerged = getProductsMerged(productsMocked)
@@ -283,30 +260,29 @@ const main = async () => {
 
     checkForm = () => {
         let isValid = true
+        let testInput
         let RegExpArray = {
-            firstName : '[a-zA-Z0-9à-üÀ-Ü-\'\s]',
-            lastName : '[a-zA-Z0-9à-üÀ-Ü-\'\s]',
-            address : '^[a-zA-Z0-9à-üÀ-Ü .,#;:\'-]{1,60}$',
-            city : '^[a-zA-Zà-üÀ-Ü]+(?:[\s-][\/a-zA-Z.]+)*$',
-            email : '^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$'
+            firstName : /^[a-zA-Z0-9à-üÀ-Ü-\'\s]+$/,
+            lastName : /^[a-zA-Z0-9à-üÀ-Ü-\'\s]+$/,
+            address : /^[a-zA-Z0-9à-üÀ-Ü .,#;:\'-]{1,60}$/,
+            city : /^[a-zA-Zà-üÀ-Ü]{1}[a-zA-Zà-üÀ-Ü-\'\.\s]+$/,
+            email : /^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$/
         }
 
         for (const [key, value] of Object.entries(RegExpArray)) {
             element = document.getElementById(`${key}`)
-            inputRegExp = new RegExp(`${value}`)
+            inputRegExp = new RegExp(value)
             testInput = inputRegExp.test(element.value)
-            console.log("testInput" + `${key}` + "  : ", testInput)
 
             if (testInput) {
                 element.nextElementSibling.innerHTML = ""
-                console.log(element.name + " valide")
+                //console.log(element.name + " valide")
             } else {
                 element.nextElementSibling.innerHTML = element.name + " invalide"
-                console.log(element.name + " invalide")
+                //console.log(element.name + " invalide")
                 isValid = false
             }
         }
-        
         return isValid
     }
 
