@@ -190,7 +190,6 @@ deleteOrder = (productsMocked) => {
 
     for (const element of deleteElement) {
         element.addEventListener('click', () => {
-            //console.log(element)
             let productId = element.getAttribute("data-id")
             let productColor = element.getAttribute("data-color")
             let valueLocalStorage = getProductValueLocalStorage(productId)
@@ -200,7 +199,7 @@ deleteOrder = (productsMocked) => {
             if (valueLocalStorage.length == 1) {
                 localStorage.removeItem(productId)
             } else {    //Si l'utilisateur supprime le produit avec plusieurs couleurs
-                valueLocalStorage.splice(indexRowColor, 1)  //Retourne un tableau correspondant à la couleur + quantité depuis le local storage
+                valueLocalStorage.splice(indexRowColor, 1)  //Retourne un tableau correspondant à la couleur + quantité d'un article depuis le local storage, ici on supprime la couleur
                 //console.log(valueLocalStorage)
                 setProductValueLocalStorage(productId, valueLocalStorage)
             }
@@ -239,7 +238,6 @@ const main = async () => {
     localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
     localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
     
-
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData()
 
@@ -262,11 +260,11 @@ const main = async () => {
         let isValid = true
         let testInput
         let RegExpArray = {
-            firstName : /^[a-zA-Z0-9à-üÀ-Ü-\'\s]+$/,
-            lastName : /^[a-zA-Z0-9à-üÀ-Ü-\'\s]+$/,
-            address : /^[a-zA-Z0-9à-üÀ-Ü .,#;:\'-]{1,60}$/,
-            city : /^[a-zA-Zà-üÀ-Ü]{1}[a-zA-Zà-üÀ-Ü-\'\.\s]+$/,
-            email : /^([a-zA-Z0-9_-])+([.]?[a-zA-Z0-9_-]{1,})*@([a-zA-Z0-9-_]{2,}[.])+[a-zA-Z]{2,3}$/
+            firstName : /^[a-zA-Zà-üÀ-Ü-\'\s]+$/,
+            lastName : /^[a-zA-Zà-üÀ-Ü-\'\s]+$/,
+            address : /^[a-zA-Z0-9à-üÀ-Ü\s%'"-&*,.\/]+/,
+            city : /^[a-zA-Zà-üÀ-Ü-\'\.\s]+$/,
+            email : /^([A-Za-z0-9_-.])+@([A-Za-z0-9_-.])+.([A-Za-z]{2,4})$/
         }
 
         for (const [key, value] of Object.entries(RegExpArray)) {
@@ -276,10 +274,8 @@ const main = async () => {
 
             if (testInput) {
                 element.nextElementSibling.innerHTML = ""
-                //console.log(element.name + " valide")
             } else {
                 element.nextElementSibling.innerHTML = element.name + " invalide"
-                //console.log(element.name + " invalide")
                 isValid = false
             }
         }
