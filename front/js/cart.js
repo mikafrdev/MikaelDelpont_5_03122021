@@ -264,7 +264,7 @@ const main = async () => {
             lastName : /^[a-zA-Zà-üÀ-Ü-\'\s]+$/,
             address : /^[a-zA-Z0-9à-üÀ-Ü\s%'"-&*,.\/]+/,
             city : /^[a-zA-Zà-üÀ-Ü-\'\.\s]+$/,
-            email : /^([A-Za-z0-9_-.])+@([A-Za-z0-9_-.])+.([A-Za-z]{2,4})$/
+            email : /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+.([A-Za-z]{2,4})$/
         }
 
         for (const [key, value] of Object.entries(RegExpArray)) {
@@ -292,11 +292,8 @@ const main = async () => {
         }
 
         let products = ["034707184e8e4eefb46400b5a3774b5f"]
-
         let fetchPostUrl = "http://localhost:3000/api/products/order"
         let fetchBody = { contact, products }
-
-        console.log(JSON.stringify(fetchBody))
 
         fetch(fetchPostUrl, {
             method: "POST",

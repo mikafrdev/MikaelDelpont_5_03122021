@@ -1,4 +1,4 @@
-//Affiche le produit passé en paramètre en produisant du code HTML
+//Affiche le produit passé en paramètre l'id du produit en génère du code HTML
 displayProduct = (product) => {        
 
     const node_IMGcnt =  document.getElementsByClassName('item__img')
@@ -27,7 +27,8 @@ displayProduct = (product) => {
 }
 
 /*
-    Si le formulaire est valide, la fonction met à jour les données du Local Storage avec un nouvel enregistrement
+    Si le formulaire est valide, la fonction met à jour les données du Local Storage 
+    avec un nouvel enregistrement
 */
 setOrder = (product) => {
 
@@ -40,7 +41,6 @@ setOrder = (product) => {
 
         //S'il y a déjà l'ID du canapé dans le localStorage
         if(valueLocalStorage){
-
             const indexSameColor = this.isColorStillOrdered (valueLocalStorage, colorChoice)
 
             //Si le canapé et la couleur sont présents dans le localStorage, on remplace l'ancien enregistrement par le nouveau
@@ -87,28 +87,24 @@ isValideForm = () => {
     }
 }
 
-//On vérifie que la couleur de l'article est déjà présente dans le localStorage sinon on renvoie -1
-isColorStillOrdered = (orderValueLS, colorChoice) => {
+/*
+    Vérifie que la couleur de l'article est déjà présente dans le localStorage sinon on renvoie -1
+    La vérification est réalisée 
 
+    Paramètres :
+    orderValueLS => Tableau contenant pour un produit tous les éléments {color, quantity} présents dans le localstorage
+    colorChoice => couleur sélectionné par l'internaute
+*/
+isColorStillOrdered = (orderValueLS, colorChoice) => {
     let i = 0
     while (i < orderValueLS.length) {
-
         if ( colorChoice == orderValueLS[i].color ) return i
         i++
     }
     return -1
 }
 
-checkOrder = () => {
-    console.log("checkOrder")
-    if (this.colorSelected != "" && this.quantitySelected != 0) {
-
-        console.log("Formulaire valide")
-    }else{
-        console.log("Formulaire KO : PB sélection couleur ou quantité")
-    }
-}
-
+//Retourne l'id du produit présent dans l'url de la page
 const getIdFromUrl = () => {
     const queryString = window.location.search
     const searchID = new URLSearchParams(queryString)
@@ -118,19 +114,15 @@ const getIdFromUrl = () => {
 }
 
 const main = async () => {
-
-    //localStorage.setItem('107fb5b75607497b96722bda5b504926', '{"colors":["Blue","green"],"quantity":["3"]}')
-    //localStorage.setItem('107fb5b75607497b96722bda5b504926', '{"orders":{"colors":"Red","quantity":"3"}}')    
+    //Récupération des données du produit en passant en paramètre l'id produit présente dans l'url
+    const product = await getMockedData(getIdFromUrl())
     
-    //On récupère les données du produit en passant en paramètre l'ID présente dans l'url
-    const productData = await getMockedData(getIdFromUrl())
+    //Affichage des informations du produit
+    displayProduct(product)
     
-    //On affiche les données du produit
-    displayProduct(productData)
-    
-    //On initialise la fonction qui se déclenche au clic sur le bouton "Ajouter au panier"
+    //En cliquant sur le bouton "Ajouter au panier" on exécute la fonction setOrder
     document.getElementById("addToCart").onclick = function() {
-        setOrder(productData)
+        setOrder(product)
     }
 }
 
