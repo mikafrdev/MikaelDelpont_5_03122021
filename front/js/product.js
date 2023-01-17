@@ -1,4 +1,4 @@
-//Affiche le produit passé en paramètre l'id du produit en génère du code HTML
+//Génère du code HTML pour afficher les informations du produit grace à l'ID présent en paramètre de l'URL
 displayProduct = (product) => {        
 
     const node_IMGcnt =  document.getElementsByClassName('item__img')
@@ -29,11 +29,14 @@ displayProduct = (product) => {
 /*
     Si le formulaire est valide, la fonction met à jour les données du Local Storage 
     avec un nouvel enregistrement
+    
+    Paramètres :
+    idProduct => ID du produit présent sur la page - l'ID est récupéré dans le paramètre 'id' de l'URL
 */
-setOrder = (product) => {
+setOrder = (idProduct) => {
 
     if (this.isValideForm()) {
-        const getValueLocalStorage = localStorage.getItem(product._id)
+        const getValueLocalStorage = localStorage.getItem(idProduct)
         const valueLocalStorage = JSON.parse(getValueLocalStorage)
         const colorChoice = document.getElementById('colors').value
         const quantityChoice = document.getElementById('quantity').value
@@ -50,7 +53,10 @@ setOrder = (product) => {
 
             //Si le canapé est présent dans le localStorage mais pas la couleur, on ajoute un enregistrement avec la nouvelle couleur
             }else{
-                newOrderValue = {color: colorChoice, quantity: quantityChoice}
+                newOrderValue = {
+                    color: colorChoice, 
+                    quantity: quantityChoice
+                }
                 valueLocalStorage.push(newOrderValue)
                 newOrderValue = valueLocalStorage
             }
@@ -58,13 +64,16 @@ setOrder = (product) => {
         //Si l'ID du canapé n'est pas trouvé dans le localStorage, on ajoute un nouvel enregistrement
         }else{
             newOrderValue = [
-                {color: colorChoice, quantity: quantityChoice}
+                {
+                    color: colorChoice, 
+                    quantity: quantityChoice
+                }
             ]
         }
 
         //Les données sont converties en STRING avant d'être enregistrées dans le localStorage
         let OrderValueStringified = JSON.stringify(newOrderValue)
-        localStorage.setItem(product._id, OrderValueStringified)
+        localStorage.setItem(idProduct, OrderValueStringified)
 
         alert("L'article a été ajouté dans le panier")
 
@@ -74,12 +83,10 @@ setOrder = (product) => {
     }
 }
 
-//On vérifie qu'une couleur et qu'un nombre d'article ont bien été sélectionnés
+//Vérification qu'une couleur et qu'un nombre d'article ont bien été renseignés
 isValideForm = () => {
-    
     let colorSelected = document.getElementById("colors").value
     let quantitySelected = document.getElementById("quantity").value
-
     if (colorSelected == "" || quantitySelected == 0) {
         return false
     }else{
@@ -114,15 +121,18 @@ const getIdFromUrl = () => {
 }
 
 const main = async () => {
+    //Récupération de l'ID du produit affiché sur la page
+    const idProduct = getIdFromUrl()
+    
     //Récupération des données du produit en passant en paramètre l'id produit présente dans l'url
-    const product = await getMockedData(getIdFromUrl())
+    const product = await getMockedData(idProduct)
     
     //Affichage des informations du produit
     displayProduct(product)
     
     //En cliquant sur le bouton "Ajouter au panier" on exécute la fonction setOrder
     document.getElementById("addToCart").onclick = function() {
-        setOrder(product)
+        setOrder(idProduct)
     }
 }
 
