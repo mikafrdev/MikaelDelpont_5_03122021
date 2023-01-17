@@ -1,10 +1,102 @@
 /*
-    Affichage des informations d'un canapé en affichant pour chacun une couleur par ligne
-    calcul le prix des articles en fonction des quantités sélectionnées
+    Récupération de toutes les informations des articles présents dans le local storage en les complétant avec les informations de la BDD
+
+    Paramètre :
+    productsMocked => Tableau d'objets contenant toutes les informations des articles de la BDD
+    Exemple :
+    [
+        {
+            "colors": [
+                "Blue",
+                "White",
+                "Black"
+            ],
+            "_id": "107fb5b75607497b96722bda5b504926",
+            "name": "Kanap Sinopé",
+            "price": 1849,
+            "imageUrl": "http://localhost:3000/images/kanap01.jpeg",
+            "description": "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            "altTxt": "Photo d'un canapé bleu, deux places"
+        },
+        ...
+    ]
 */
-displayProducts = (productsMocked, productsMerged, option) => {
+const getProductsMerged = (productsMocked) => {
+    let order = new Array
+    let productsMerged = new Array
+
+    //Boucle sur tous les éléments du local storage
+    for (let i = 0; i < localStorage.length; i++) {
+        let idLocalStorage = localStorage.key(i)
+        let valueLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
+
+        //On identifie l'ID de l'article correspondant dans la base de donnée afin d'y récupérer toutes les informations
+        let productsDataOrder = productsMocked.find(element => element._id == idLocalStorage)
+
+        //Création d'un objet article avec toutes ses informations
+        productAllData = {
+            id: idLocalStorage,
+            altTxt: productsDataOrder.altTxt,
+            description: productsDataOrder.description,
+            imageUrl: productsDataOrder.imageUrl,
+            name: productsDataOrder.name,
+            price: productsDataOrder.price,
+            details: valueLocalStorage
+        }
+
+        //Ajout de l'article et de ses informations dans le tableau productsMerged
+        productsMerged.push(productAllData)
+    }
+    return productsMerged
+}
+
+/*
+    Retourne un tableau avec les informations {color, quantity} d'un produit dans le local storage
+    Exemple :
+    [
+        {color: 'Pink', quantity: '8'},
+        {color: 'Brown', quantity: '4'},
+        ...
+    ]
+
+    Paramètres :
+    productId => ID d'un article
+*/
+const getProductValueLocalStorage = (productId) => {
+    const valueLocalStorage = JSON.parse(localStorage.getItem(productId))
+    return valueLocalStorage
+}
+
+/*
+    Met à jour le local storage avec le duo clé-valeur :
+    KEY => productId
+    VALUE => valueLocalStorage
+
+    Paramètres :
+    productId => ID d'un article  <numérique>
+    valueLocalStorage => Tableau d'objets contenant la paire {color, quantity}
+    Exemple :
+    [
+        {color: 'Pink', quantity: '8'},
+        {color: 'Brown', quantity: '4'},
+        ...
+    ]
+*/
+const setProductValueLocalStorage = (productId, valueLocalStorage) => {
+    let valueLocalStorageStringified = JSON.stringify(valueLocalStorage)
+    localStorage.setItem(productId, valueLocalStorageStringified)
+}
+
+/*
+    Affichage des articles qui ont été enregistrés dans le local storage
     
-    //Supprime tous les articles de l'affichage uniquement
+    Paramètres :
+    productsMocked => Tableau contenant tous les articles présents dans la BDD
+    productsMerged => Tableau contenant uniquement les articles présents dans le local storage auxquels on a ajouté toutes les informations relatives et présentes dans la BDD
+    option => Si option = "refresh", efface tous les articles de la page ce qui permet de mettre à jour l'affichage suite à des modification de quantité ou des suppression d'articles réalisés par l'internaute
+*/
+displayProducts = (productsMocked, productsMerged, option) => {    
+    //Supprime tous les articles affichés dans la page
     if (option == "refresh") {
         var e = document.getElementById("cart__items")
         var child = e.lastElementChild
@@ -17,6 +109,7 @@ displayProducts = (productsMocked, productsMerged, option) => {
 
     const node_parent = document.getElementById('cart__items')
 
+    //Si au moins 1 article est présent dans la local storage
     if (productsMerged.length) {
         productsMerged.forEach(function (product) {
             const node_article = document.createElement("article")
@@ -96,6 +189,7 @@ displayProducts = (productsMocked, productsMerged, option) => {
                 node_div_4.appendChild(node_p_supprimer)
             })
         })
+    //Si aucun article est présent dans la local storage, affichage d'un message utilisateur
     }else{
         node_message = document.createElement("div")
         node_message.setAttribute("class", "cart__item")
@@ -103,80 +197,60 @@ displayProducts = (productsMocked, productsMerged, option) => {
         node_parent.appendChild(node_message)
     }
 
+    //Initialisation des évènements relatifs au nouvel affichage
     changeProductQuantity(productsMocked)
     updatePrices()
     updateQuantities()
     deleteOrder(productsMocked)
 }
 
+/*  
+    En changeant la quantité d'un article, le local storage est mis à jour et l'affichage des articles est rafraichi 
+
+    Paramètres :
+    productsMocked => Tableau contenant tous les articles présents dans la BDD
+*/
 changeProductQuantity = (productsMocked) => {
+    //Récupération de tous les input qui gèrent les quantités des articles
     const elementsQuantity = document.getElementsByClassName("itemQuantity")
 
+    //Boucle pour créer un évènement click sur chaque input quantity
     for (const element of elementsQuantity) {
-        element.addEventListener('click', function () {    
-            let productColor = element.getAttribute("data-color")
+        element.addEventListener('click', function () {  
+
+            //Récupération de la couleur relative à l'élément input sur lequel l'internaute à cliqué
+            const productColor = element.getAttribute("data-color")
+            
+            //Récupération de l'ID de l'article relatif à l'élément input sur lequel l'internaute à cliqué
             const productId = element.closest(".cart__item").getAttribute("data-id")
             let ProductValueLocalStorage = new Array
+
+            //Récupération des informations {color, quantity} dans le local storage de l'article 
             ProductValueLocalStorage = getProductValueLocalStorage(productId)
 
-            let index = ProductValueLocalStorage.findIndex(function (todo, index) {
-                return todo.color == productColor
-            })
+            //Retourne l'index d'où se trouve la couleur correspondante du tableau ProductValueLocalStorage
+            const index = ProductValueLocalStorage.findIndex(element => element.color == productColor)
 
+            //Création de l'objet {color, quantity} qui sera injecté dans le tableau ProductValueLocalStorage avec la nouvelle quantité
             newProductDetail = {
                 color: productColor,
                 quantity: element.value
             }
 
+            //Mise à jour de la nouvelle quantité dans le tableau ProductValueLocalStorage à l'aide de l'objet newProductDetail
             ProductValueLocalStorage.splice(index, 1, newProductDetail)
+            
+            //Mise à jour dans le local storage de la nouvelle quantité saisie par l'internaute
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
-            let productsMerged = getProductsMerged(productsMocked)
+            
+            //Récupération de toutes les informations des articles présents dans le local storage en les complétant avec les informations de la BDD
+            const productsMerged = getProductsMerged(productsMocked)
+            
+            //Mise à jour de l'affichage des articles de la page
             displayProducts(productsMocked, productsMerged, "refresh")
         })
     }
     
-}
-
-const getProductValueLocalStorage = (productId) => {
-    const valueLocalStorage = JSON.parse(localStorage.getItem(productId))
-    return valueLocalStorage
-}
-
-let setProductValueLocalStorage = (productId, valueLocalStorage) => {
-    console.log(productId)
-    console.log(valueLocalStorage)
-    let valueLocalStorageStringified = JSON.stringify(valueLocalStorage)
-    localStorage.setItem(productId, valueLocalStorageStringified)
-}
-
-//Retourne un tableau d'objets contenant les informations des produits et de la commande imbriqués
-const getProductsMerged = (productsMocked) => {
-    let order = new Array
-    let productsDatasOrder = new Array
-
-    for (let i = 0; i < localStorage.length; i++) {
-        let idLocalStorage = localStorage.key(i)
-        let valueLocalStorage = JSON.parse(localStorage.getItem(idLocalStorage))
-
-        //On récupère toutes les informations des produits présents dans le local storage en faisant matcher leur ID avec celui de la BDD
-        let productsDataOrder = productsMocked.find(function (val, index) {
-            //console.log("val._id, idLocalStorage : ", val._id, idLocalStorage)
-            if (val._id == idLocalStorage) return val
-        })
-
-        order = {
-            id: idLocalStorage,
-            altTxt: productsDataOrder.altTxt,
-            description: productsDataOrder.description,
-            imageUrl: productsDataOrder.imageUrl,
-            name: productsDataOrder.name,
-            price: productsDataOrder.price,
-            details: valueLocalStorage
-        }
-
-        productsDatasOrder.push(order)
-    }
-    return productsDatasOrder
 }
 
 /*
@@ -184,23 +258,28 @@ const getProductsMerged = (productsMocked) => {
     - Si 1 seule couleur est présente pour 1 canapé, on supprime tout le bloc image du canapé + commande
     - Si plusieurs couleurs sont renseignées, on ne supprime que la ligne concernée
     - Les informations du localStorage sont mise à jour
+
+    Paramètre :
+    productsMocked => Tableau contenant tous les articles présents dans la BDD
 */
 deleteOrder = (productsMocked) => {
+    
+    //Récupération de tous les éléments "Supprimer"
     let deleteElement = document.getElementsByClassName("deleteItem")
 
+    //Boucle pour créer un évènement click sur chaque élément "Supprimer"
     for (const element of deleteElement) {
         element.addEventListener('click', () => {
             let productId = element.getAttribute("data-id")
             let productColor = element.getAttribute("data-color")
             let valueLocalStorage = getProductValueLocalStorage(productId)
-            let indexRowColor = valueLocalStorage.findIndex(row => row.color == productColor)   //Retourne l'index de la couleur correspondante dans le localstorage
+            let indexRowColor = valueLocalStorage.findIndex(row => row.color == productColor)   //Retourne l'index de la couleur correspondante d'un article dans le localstorage
 
             //Si l'utilisateur supprime le produit avec 1 seule couleur
             if (valueLocalStorage.length == 1) {
                 localStorage.removeItem(productId)
             } else {    //Si l'utilisateur supprime le produit avec plusieurs couleurs
                 valueLocalStorage.splice(indexRowColor, 1)  //Retourne un tableau correspondant à la couleur + quantité d'un article depuis le local storage, ici on supprime la couleur
-                //console.log(valueLocalStorage)
                 setProductValueLocalStorage(productId, valueLocalStorage)
             }
             let productsMerged = getProductsMerged(productsMocked)
@@ -209,17 +288,21 @@ deleteOrder = (productsMocked) => {
     }
 }
 
+//Mise à jour du total des prix de la commande des articles
 updatePrices = () => {
+    //Récupération de tous les prix de la commande
     const productsPrices = document.getElementsByClassName("pricequantity")
     const totalPrice = document.getElementById("totalPrice")
     let productPriceCleaned = 0
 
     for (const productNode of productsPrices) {
+        //Calcul de tous les prix, on formate au préalable la chaine de caractère pour permettre le calcul en supprimant l'unité et l'espace " €" afin de ne garder que le prix
         productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
     }
     totalPrice.innerHTML = productPriceCleaned
 }
 
+//Mise à jour du total des quantités (même structure que pour les prix)
 updateQuantities = () => {
     const totalQuantity = document.getElementById("totalQuantity")
     const productsQuantity = document.getElementsByClassName("itemQuantity")
@@ -232,16 +315,10 @@ updateQuantities = () => {
 }
 
 const main = async () => {
-    //Enregistrement en dur pour les tests - A supprimer
-    
-    localStorage.setItem('8906dfda133f4c20a9d0e34f18adcf06', '[{"color":"Grey","quantity":"1"},{"color":"Purple","quantity":"1"},{"color":"Blue","quantity":"2"}]')
-    localStorage.setItem('a6ec5b49bd164d7fbe10f37b6363f9fb', '[{"color":"Pink","quantity":"2"},{"color":"Brown","quantity":"3"},{"color":"Yellow","quantity":"3"},{"color":"White","quantity":"3"}]')
-    localStorage.setItem('034707184e8e4eefb46400b5a3774b5f', '[{"color":"Silver","quantity":"3"}]')
-    
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData()
 
-    //Récupération de toutes les informations des produits présents dans le local storage
+    //Récupération de toutes les informations des articles dans le local storage en les complétant avec les informations de la BDD
     const productsMerged = getProductsMerged(productsMocked)
     displayProducts(productsMocked, productsMerged) //Affichage des produits 
 
