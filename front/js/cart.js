@@ -254,7 +254,6 @@ changeProductQuantity = (productsMocked) => {
     productsMocked => Tableau contenant tous les articles présents dans la BDD
 */
 deleteOrder = (productsMocked) => {
-    
     //Récupération de tous les éléments "Supprimer"
     let deleteElement = document.getElementsByClassName("deleteItem")
 
@@ -302,6 +301,48 @@ updateQuantities = () => {
     document.getElementById("totalQuantity").innerHTML = totalQuantity
 }
 
+
+/*
+    Réalise la validation de la commande    
+
+    Paramètre :
+    contact => Objet contenant les informations saisies par l'internaute dans le formulaire
+*/
+fetchPostOrder = (contact) => {
+    //Récupération de l'id des produits
+    let products = new Array
+    for (let [key] of Object.entries(localStorage)) {
+        products.push(key)
+    }
+
+    let fetchPostUrl = "http://localhost:3000/api/products/order"
+    let fetchBody = { contact, products }
+
+    fetch(fetchPostUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify(fetchBody)
+    })
+        .then((res) => {
+            if (res.ok) {
+                return res.json()
+            } else {
+                console.log("Problème server")
+            }
+        })
+        .then((data) => {
+            console.log('Success:', data)
+            //document.location.href="confirmation.html?orderId="+data.orderId
+            return data
+        })
+        .catch((error) => {
+            console.error('Error:', error)
+
+        })
+}
+
 const main = async () => {
     //Récupération des données de tous les produits présents dans la BDD
     const productsMocked = await getMockedData()
@@ -310,80 +351,35 @@ const main = async () => {
     const productsMerged = getProductsMerged(productsMocked)
     displayProducts(productsMocked, productsMerged) //Affichage des produits 
 
-    const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
     formUser.addEventListener('submit', function (event) {
         event.preventDefault()  //Empêche le formulaire d'être exécuté
-        isValid = checkForm()
-
-        if (isValid) {
-            fetchPostOrder()
-        }
-    })
-
-    checkForm = () => {
-        let isValid = true
-        let testInput
-        let RegExpArray = {
-            firstName : /^[a-zA-Zà-üÀ-Ü-\'\s]+$/,
-            lastName : /^[a-zA-Zà-üÀ-Ü-\'\s]+$/,
-            address : /^[a-zA-Z0-9à-üÀ-Ü\s%'"-&*,.\/]+/,
-            city : /^[a-zA-Zà-üÀ-Ü-\'\.\s]+$/,
+        let isValidForm = true
+        let isValidRegExp
+        let contact = new Object
+        
+        let RegExpList = {
+            firstName : /^[a-zA-Zà-üÀ-Ü]+[a-zA-Zà-üÀ-Ü-\'\s]*[a-zA-Zà-üÀ-Ü]+$/,
+            lastName : /^[a-zA-Zà-üÀ-Ü]+[a-zA-Zà-üÀ-Ü-\'\s]*[a-zA-Zà-üÀ-Ü]+$/,
+            address : /^[a-zA-Z0-9à-üÀ-Ü]+[a-zA-Z0-9à-üÀ-Ü\s%'"-&*,.\/]*[a-zA-Z0-9à-üÀ-Ü]+$/,
+            city : /^[a-zA-Z0-9à-üÀ-Ü]+[a-zA-Z0-9à-üÀ-Ü\s%'"-&*,.\/]*[a-zA-Z0-9à-üÀ-Ü]+$/,
             email : /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+.([A-Za-z]{2,4})$/
         }
 
-        for (const [key, value] of Object.entries(RegExpArray)) {
-            element = document.getElementById(`${key}`)
-            inputRegExp = new RegExp(value)
-            testInput = inputRegExp.test(element.value)
-
-            if (testInput) {
+        //Test de chaque champ du formulaire avec sa regExp associée
+        for (const regExp in RegExpList) {
+            element = document.getElementById(regExp)
+            inputRegExp = new RegExp(RegExpList[regExp])
+            isValidRegExp = inputRegExp.test(element.value)
+            
+            if (isValidRegExp) {
                 element.nextElementSibling.innerHTML = ""
+                contact[regExp] = element.value
             } else {
                 element.nextElementSibling.innerHTML = element.name + " invalide"
-                isValid = false
             }
         }
-        return isValid
-    }
-
-    fetchPostOrder = () => {
-        let contact = {
-            firstName: "test",
-            lastName: "test",
-            address: "1 rue du test",
-            city: "Ville-test",
-            email: "unemail@testemail.com"
-        }
-
-        let products = ["034707184e8e4eefb46400b5a3774b5f"]
-        let fetchPostUrl = "http://localhost:3000/api/products/order"
-        let fetchBody = { contact, products }
-
-        fetch(fetchPostUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json; charset=utf-8"
-            },
-            body: JSON.stringify(fetchBody)
-        })
-            .then((res) => {
-                if (res.ok) {
-                    return res.json()
-                } else {
-                    console.log("Problème server")
-                }
-            })
-            .then((data) => {
-                console.log('Success:', data)
-                //document.location.href="confirmation.html?orderId="+data.orderId
-                return data
-            })
-            .catch((error) => {
-                console.error('Error:', error)
-
-            })
-    }
-    //fetchPostOrder()
+        if (isValidForm) fetchPostOrder(contact)
+    })
 
 } //END MAIN
 
