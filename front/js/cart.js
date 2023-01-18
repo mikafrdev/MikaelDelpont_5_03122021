@@ -218,10 +218,7 @@ changeProductQuantity = (productsMocked) => {
     for (const element of elementsQuantity) {
         element.addEventListener('click', function () {  
 
-            //Récupération de la couleur relative à l'élément input sur lequel l'internaute à cliqué
-            const productColor = element.getAttribute("data-color")
-            
-            //Récupération de l'ID de l'article relatif à l'élément input sur lequel l'internaute à cliqué
+            const productColor = element.getAttribute("data-color")            
             const productId = element.closest(".cart__item").getAttribute("data-id")
             let ProductValueLocalStorage = new Array
 
@@ -231,7 +228,6 @@ changeProductQuantity = (productsMocked) => {
             //Retourne l'index d'où se trouve la couleur correspondante du tableau ProductValueLocalStorage
             const index = ProductValueLocalStorage.findIndex(element => element.color == productColor)
 
-            //Création de l'objet {color, quantity} qui sera injecté dans le tableau ProductValueLocalStorage avec la nouvelle quantité
             newProductDetail = {
                 color: productColor,
                 quantity: element.value
@@ -240,13 +236,8 @@ changeProductQuantity = (productsMocked) => {
             //Mise à jour de la nouvelle quantité dans le tableau ProductValueLocalStorage à l'aide de l'objet newProductDetail
             ProductValueLocalStorage.splice(index, 1, newProductDetail)
             
-            //Mise à jour dans le local storage de la nouvelle quantité saisie par l'internaute
             setProductValueLocalStorage(productId, ProductValueLocalStorage)
-            
-            //Récupération de toutes les informations des articles présents dans le local storage en les complétant avec les informations de la BDD
             const productsMerged = getProductsMerged(productsMocked)
-            
-            //Mise à jour de l'affichage des articles de la page
             displayProducts(productsMocked, productsMerged, "refresh")
         })
     }
@@ -290,28 +281,25 @@ deleteOrder = (productsMocked) => {
 
 //Mise à jour du total des prix de la commande des articles
 updatePrices = () => {
-    //Récupération de tous les prix de la commande
     const productsPrices = document.getElementsByClassName("pricequantity")
-    const totalPrice = document.getElementById("totalPrice")
-    let productPriceCleaned = 0
+    let totalPrice = 0
 
     for (const productNode of productsPrices) {
         //Calcul de tous les prix, on formate au préalable la chaine de caractère pour permettre le calcul en supprimant l'unité et l'espace " €" afin de ne garder que le prix
-        productPriceCleaned = productPriceCleaned + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
+        totalPrice = totalPrice + parseInt(productNode.innerHTML.substring(0, productNode.innerHTML.length - 2))
     }
-    totalPrice.innerHTML = productPriceCleaned
+    document.getElementById("totalPrice").innerHTML = totalPrice
 }
 
-//Mise à jour du total des quantités (même structure que pour les prix)
+//Mise à jour du total des quantités
 updateQuantities = () => {
-    const totalQuantity = document.getElementById("totalQuantity")
     const productsQuantity = document.getElementsByClassName("itemQuantity")
-    let productQuantityCleaned = 0
+    let totalQuantity = 0
 
     for (const productNode of productsQuantity) {
-        productQuantityCleaned = productQuantityCleaned + parseInt(productNode.value.substring(0, productNode.value.length))
+        totalQuantity = totalQuantity + parseInt(productNode.value)
     }
-    totalQuantity.innerHTML = productQuantityCleaned
+    document.getElementById("totalQuantity").innerHTML = totalQuantity
 }
 
 const main = async () => {
@@ -322,7 +310,6 @@ const main = async () => {
     const productsMerged = getProductsMerged(productsMocked)
     displayProducts(productsMocked, productsMerged) //Affichage des produits 
 
-    /*************** Ecouter le clic sur le submit du formulaire ***************/
     const formInputs = document.querySelectorAll('#formUser input[type=text], #formUser input[type=email]')
     formUser.addEventListener('submit', function (event) {
         event.preventDefault()  //Empêche le formulaire d'être exécuté
