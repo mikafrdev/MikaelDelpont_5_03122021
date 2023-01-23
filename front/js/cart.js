@@ -199,8 +199,8 @@ displayProducts = (productsMocked, productsMerged, option) => {
 
     //Initialisation des évènements relatifs au nouvel affichage
     changeProductQuantity(productsMocked)
-    updatePrices()
     updateQuantities()
+    updatePrices()
     deleteOrder(productsMocked)
 }
 
@@ -334,12 +334,11 @@ fetchPostOrder = (contact) => {
         })
         .then((data) => {
             console.log('Success:', data)
-            //document.location.href="confirmation.html?orderId="+data.orderId
-            return data
+            document.location.href="confirmation.html?orderId="+data.orderId
+            //return data
         })
         .catch((error) => {
             console.error('Error:', error)
-
         })
 }
 
@@ -376,6 +375,7 @@ const main = async () => {
                 contact[regExp] = element.value
             } else {
                 element.nextElementSibling.innerHTML = element.name + " invalide"
+                isValidForm = false
             }
         }
         if (isValidForm) fetchPostOrder(contact)
