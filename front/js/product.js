@@ -35,21 +35,21 @@ displayProduct = (product) => {
 */
 setOrder = (idProduct) => {
 
-    if (this.isValideForm()) {
+    if (isValideForm()) {
         const getValueLocalStorage = localStorage.getItem(idProduct)
         const valueLocalStorage = JSON.parse(getValueLocalStorage)
         const colorChoice = document.getElementById('colors').value
-        const quantityChoice = document.getElementById('quantity').value
+        const quantityChoice = parseInt(document.getElementById('quantity').value)
         let newOrderValue = {}
 
         //S'il y a déjà l'ID du canapé dans le localStorage
         if(valueLocalStorage){
-            const indexSameColor = this.isColorStillOrdered (valueLocalStorage, colorChoice)
+            const indexSameColor = isColorStillOrdered (valueLocalStorage, colorChoice)
 
             //Si le canapé et la couleur sont présents dans le localStorage, on remplace l'ancien enregistrement par le nouveau
             if(indexSameColor != -1){
                 newOrderValue = valueLocalStorage
-                newOrderValue[indexSameColor].quantity = quantityChoice
+                newOrderValue[indexSameColor].quantity = parseInt(newOrderValue[indexSameColor].quantity) + quantityChoice
 
             //Si le canapé est présent dans le localStorage mais pas la couleur, on ajoute un enregistrement avec la nouvelle couleur
             }else{

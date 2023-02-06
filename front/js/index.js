@@ -1,7 +1,7 @@
 //Affiche les canapés passés en paramètre en produisant du code HTML
 const displayProducts = (productsData) => {
 
-    console.log("displayKanaps")
+    console.log("displayProducts")
     let htmlContent
 
     for(const val in productsData){

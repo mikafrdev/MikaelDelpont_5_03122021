@@ -14,7 +14,7 @@ getMockedData = async (productID) => {
     let canap = await fetch(apiUrl)
     .then((response) => {
         if (response.ok) {
-            //console.log("Réponse ok du server")
+            //retourne la réponse en tant qu’objet JSON
             return response.json()
         }else{
             console.log("Problème server")

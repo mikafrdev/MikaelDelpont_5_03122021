@@ -230,7 +230,7 @@ changeProductQuantity = (productsMocked) => {
 
             newProductDetail = {
                 color: productColor,
-                quantity: element.value
+                quantity: parseInt(element.value)
             }
 
             //Mise à jour de la nouvelle quantité dans le tableau ProductValueLocalStorage à l'aide de l'objet newProductDetail
